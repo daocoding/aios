@@ -47,3 +47,10 @@ value-based price options with consumer and producer surplus, unit economics, a 
 Flag risks: seasonality ending, compliance or certification gaps, regional standards (plugs, sizes, labeling).
 Be explicit about uncertainty. Never recommend bulk commitment on fewer than 3 independent signals.
 ```
+
+## Field notes (v2)
+- First batch: ~50–80 units by air; prepare five creative directions (pain scene, before/after, demo, price anchor, creator talk) while stock is in transit.
+- MVT metrics in funnel order: product-card CTR → creator response/output → conversion.
+- Back-solve competitors' cost from their price; record every candidate in a selection log.
+- Selling an existing product first is a cheap way to prove the channel loop before building your own SKU.
+- **Operating Sheets:** `market-stage`, `offer-scorecard`, `unit-economics`, `test-sprint`, `launch-plan` (in-app at `/tools`, or `templates/xlsx/`).

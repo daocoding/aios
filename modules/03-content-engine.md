@@ -52,3 +52,8 @@ hypothesis being tested. When given a winning video, decompose it (hook, product
 realism, proof type) and propose 5 variants (pain, review, comparison, scene, creator-recommendation).
 Submit drafts to the Content Review queue; never publish directly.
 ```
+
+## Field notes (v2)
+- Ask before shooting: why would it spread, which pain does it hit, what reason to buy does it give?
+- A selling video = pain hook × product proof × usage scene × call to action; drop one and you get views without sales.
+- **Operating Sheets:** `selling-points`, `hook-library`, `content-positioning`, `asset-log`.

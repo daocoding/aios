@@ -21,3 +21,7 @@
 - **Days 11–17:** selling points 3–4; first paid tests in 0→1 mode (aim for ~50 conversions).
 - **Days 18–24:** double down on the leading selling point; remake heroes; second creator wave.
 - **Days 25–30:** read out the three signals; retrospective; decide whether to scale, iterate, or stop.
+
+## Field notes (v2)
+- Org path: 0→1 founder judgment, 1→10 module coordination, 10→100 organizational system.
+- **Operating Sheets:** `weekly-review`, `role-kpis`.

@@ -22,3 +22,6 @@ Creator & short-video platforms ──ignite──▶ Marketplaces ──capture
 - Treat every new region or channel as a new hypothesis (module 00).
 
 Platform windows let you win once. The method lets you keep winning when the market gets competitive. AI makes the method durable.
+
+## Field notes (v2)
+- Engine (creator platforms) → base (marketplaces) → profit pool (owned store/community) → moat (brand). Judge total business lift, not one dashboard.

@@ -39,3 +39,10 @@ creative quality → conversion path. 3) Triage every creative P0/P1/P2 with one
 at most 3 changes, each single-variable, with expected effect and a check date. 5) Identify seeding creatives
 that must not be paused. Never change live campaigns yourself; output recommendations for owner approval.
 ```
+
+## Field notes (v2)
+- Compute break-even ROI before judging any campaign; a target above break-even starves delivery.
+- Check creative activation: if only a small share of uploaded creatives deliver, fix homogeneity/rejections before adding more.
+- On a spike, identify its source (product, creative, price, creator, event) and replicate that same day.
+- 10→100: profit model first; run sales events as warm-up → peak → encore.
+- **Operating Sheet:** `ad-diagnosis` (KPIs: blended ROAS, conversions toward 50).

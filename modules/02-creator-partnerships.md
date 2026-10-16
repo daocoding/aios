@@ -38,3 +38,9 @@ first line that lowers the cold feel, benefit to them, sample/commission/support
 (c) after each wave, diagnose low replies or returns in the fixed order and propose ONE change for the next wave.
 Treat creators as long-term partners. Never send anything without owner approval. Always include disclosure guidance.
 ```
+
+## Field notes (v2)
+- Locate the funnel break first: no reply → no sample → no video → no sales. Each is a different fix.
+- Communication ladder (strongest first): in person/gifts → group channel → call → voice → text.
+- Owner metrics: reply rate, creator retention, video return rate (≈90%), re-booking/conversion rate (≈half of active creators), sales.
+- **Operating Sheet:** `creator-pipeline` (KPIs: reply rate, content return rate, revenue per sample).

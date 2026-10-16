@@ -142,8 +142,16 @@ Work backwards from price: subtract product cost, logistics, platform commission
 - Run a **30-day test sprint**: by day 30 you should know whether it sells, which selling point works, how the story should be told, and to whom.
 - Read three signals: (1) do people click/engage, (2) how do creators react after trying it, (3) does it **convert** — customers voting with money.
 - Only after the content tests pass do you commit large inventory.
+- Practical shape of the first batch: roughly **50–80 units shipped by the fastest route** (air), so inventory risk and calendar time both stay small.
+- **Creative before cargo:** while the batch is in transit, prepare five creative directions so testing starts the day stock lands: *pain scene*, *before/after*, *usage demo*, *price anchor*, *creator talk-to-camera*. Line up creators in the same window.
+- The three MVT metrics, in funnel order: **product-card click-through**, **creator response and content output**, **conversion**.
 
-### 4.7 AI's role here
+### 4.7 The selection workflow (0→1)
+1. Pick the market/site that matches your capability (see 4.1). 2. Pick the core category. 3. Choose data sources (platform bestseller lists, marketplace movers, review mining). 4. Write the pool criteria (three-axis test). 5. Study competitor shops and back-solve their cost from their price, so you know how much "ammunition" each side has. 6. Cost it out with the full stack (unit cost, first/last-mile logistics, warehousing, commission, ads, creator commission, returns). 7. Record every candidate in a **selection log** — the log, not memory, is what gets reviewed. *(aiOS: Offer Scorecard + Unit Economics sheets.)*
+
+Prove the loop before you build a product: selling an existing (even third-party) product first is a cheap way to learn the channel, the audience, and the content before committing to your own SKU.
+
+### 4.8 AI's role here
 A human analyst can evaluate 3–4 opportunities at a time; an agent can screen hundreds. Agents produce a market-insight brief from a product photo + goal: who buys, why, competing bestsellers, comparison table, creator and content suggestions, and risk flags (seasonality ending, compliance gaps). Winners are **selected, not pushed**: a product's ceiling is largely decided at the moment you choose it.
 
 ---
@@ -172,6 +180,12 @@ Write one brief per **audience segment** (parents, fitness, beauty, general…);
 - **Content return rate** on samples (target ≥ 90%; below that, fix selection or terms)
 - Sales generated per creator
 - Diagnose low replies systematically: creator profile? opening line? reason-to-partner? commission? product differentiation?
+
+**Locate the break before fixing anything.** "Lots of outreach, few results" is four different problems: no reply (your reason-to-partner is weak — it is rarely a shortage of creators), replied but no sample, sample but no video, video but no sales. Measure each step on a small sample (reply rate, sample rate, video rate, sales rate) before scaling the volume.
+
+**Communication ladder (strongest first):** in-person / thoughtful gifts (core long-term partners) → a group channel for ongoing partners → video or phone call (trust with key creators) → voice notes (tone) → plain text (efficient, but cold and easily misread). Move important relationships up the ladder.
+
+**What the owner tracks:** outcome (sales); outreach reply rate (is the script/channel working?); creator retention after the first deal; video return rate on samples (≈90% target); conversion / re-booking rate (around half of active creators is a healthy benchmark). Except content quality, nearly all partnership work can be quantified — which is how you tell real performers from busy-looking ones. Without process, good partnerships are one person's skill; with process they become company capability.
 
 **Stage-adaptive play:** early markets → seed broadly to learn; growth markets → go deep in your category first, then adjacent categories; mature markets (creator prices bid up) → become a content producer yourself; asset stage → manage a relationship network.
 
@@ -209,6 +223,8 @@ Ads are the biggest lever on a proven asset, and the highest-leverage role per p
 | **1→10 Replicate** | Turn accidental winners into repeatable ones | Build a creative matrix (rule of thumb: ~2 creatives per daily order targeted); put budget behind high-converting assets, not evenly; don't kill seeding assets just because they don't convert directly — volume will drop. |
 | **10→100 Scale** | Many products, markets, teams | Run paid media as a shared central service; every new creative test is a search for more "hero" creatives; scale = number of heroes. |
 
+**Signals, not switches.** Automated campaigns allocate traffic; the owner and media buyer supply clear signals — product strength, creative, price, creator proof. Treat paid as an amplifier of a business mix (product × content × budget × ROI × margin × inventory), never as a traffic tap. Compute **break-even ROI** (net of margin, refunds, creator commission, logistics, platform fees) before judging any campaign. When a sudden spike happens, first identify what caused it (product, creative, price, creator, event) and replicate *that* the same day — 1→10 is about copying the win rate, not the budget. At 10→100, build a profit model (GMV, ad cost, COGS, logistics, refunds, inventory) and run big sales events in three phases: warm-up, peak, encore.
+
 **Diagnosis order when ROI is below break-even:** (1) ROI target setting → (2) creative activation rate → (3) creative quality → (4) product page, price, reviews, conversion. Triage creatives as **P0** (fix the opening now), **P1** (watch), **P2** (leave alone). Pause chronic money-losers quickly.
 
 ---
@@ -221,10 +237,14 @@ Ads are the biggest lever on a proven asset, and the highest-leverage role per p
 - **Maturity ladder:** L1 automate frontline tasks → L2 managers orchestrate agents across a function → L3 cross-functional agent workflows → L4 the CEO orchestrates the whole operation through role agents. The leader's conviction determines how far it goes.
 - **Stage the adoption:** in 0→1, automate only what creates positive feedback (e.g., batch content production); in 1→10, expand role by role; in 10→100, scale across markets/categories. A "perfect AI org" pasted onto a real company just exposes holes.
 - **Agent hub architecture:** management layer + function centers (content, creators, live, paid, ops) talk to a central agent hub that reaches into product, supply, fulfillment, support, ad analytics, and finance. The CEO can ask a role agent in a group chat ("how's the business this week?") and get an answer in a minute.
+- **Org path by stage:** 0→1 runs on founder judgment (close the smallest loop yourself); 1→10 runs on module coordination (replicable playbooks); 10→100 runs on the organizational system. AI's share: market insight, selection analysis, creator outreach, video breakdown, ad diagnosis, data review. The leader's share: define problems, set standards, design processes, judge results, train the system.
+- **Orchestrator pattern:** a lead agent receives a goal, decomposes it, dispatches to specialist agents (vision analysis, scripts, outreach, ads), and returns one consolidated plan for human approval.
 - Productivity benchmark idea: measure **revenue per person** and expect AI to lift it materially; hire for the size of business a person (plus agents) can drive.
 
 ## 7. Layer 5 — The channel flywheel
 Creator platforms **ignite** demand (cheapest attention today); marketplaces **capture** spillover search demand (people see it on video, then search your brand where they already shop); your **owned store / owned audience** compounds margin and retention (repeat purchase, direct reach, less platform risk). Judge the whole system, not one channel's dashboard: a short-video push often shows up as branded search on a marketplace.
+
+Four links, one flywheel: **creator platforms = engine** (seeding and spread), **marketplaces = base** (trust, search conversion, repeat), **owned store / community = profit pool** (retention, direct relationship, higher margin, resilience across platform cycles), **brand = moat** (mindshare and pricing power). Operators watch one channel's GMV; owners watch total business lift.
 
 Dividends (platform windows) let you win once; a scientific model lets you keep winning in the competitive phase; AI makes the model durable and raises the owner's decision quality.
 

@@ -29,3 +29,8 @@ Operator (status and priorities) · Opportunity Analyst (01) · Creator Partners
 
 ## Metric
 Revenue per person (people + agents). Expect AI to lift it materially. Hire for the size of business a person plus agents can drive.
+
+## Field notes (v2)
+- AI owns: market insight, selection analysis, creator outreach, video breakdown, ad diagnosis, data review. Humans own: problem definition, standards, process design, judging results, training the system.
+- Orchestrator pattern: one lead agent decomposes a goal, dispatches specialist agents, and returns one plan for human approval.
+- **Operating Sheet:** `role-kpis`.

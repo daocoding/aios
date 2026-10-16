@@ -28,3 +28,6 @@ Maintain the hypothesis ledger. Reject any proposed action without a ledger row 
 kill criterion, budget cap). Weekly: compile the review from ledger + asset log + creator pipeline + paid
 diagnosis; report results as observed; list independent signals per decision; propose SOP/prompt updates as diffs.
 ```
+
+## Field notes (v2)
+- **Operating Sheets:** `hypothesis-ledger`, `weekly-review`.

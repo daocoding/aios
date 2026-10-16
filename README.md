@@ -26,6 +26,8 @@ Any business that sells through creators, influencers, and short-form content: c
 | [`modules/`](modules/) | Nine agent-runnable playbooks, each with procedure, decision rules, outputs, a human gate, and a pasteable agent prompt |
 | [`templates/`](templates/) | Hypothesis ledger, offer scorecard, launch plan, outreach, creator brief, hook library, asset log, creator pipeline, weekly review, role manual |
 | [`tools/unit_economics.py`](tools/unit_economics.py) | Price → margin → "profit product / traffic product / drop" classifier |
+| **Operating Sheets** (`/tools` in the app) | 14 live spreadsheets with formulas, saved per user, CSV/XLSX import and export: market stage, offer scorecard, unit economics, selling points, hook library, content positioning, asset log, creator pipeline, ad diagnosis, hypothesis ledger, test sprint, launch plan, weekly review, role KPIs |
+| [`templates/xlsx/`](templates/xlsx/) · [`templates/aios-operating-sheets.xlsx`](templates/aios-operating-sheets.xlsx) | The same 14 sheets as Excel workbooks (formulas, dropdowns, sample rows); rebuild with `tools/build_xlsx.py` |
 | [`apps/content-review/`](apps/content-review/) | The human approval gate: full-width rows, select all, bulk approve. Python stdlib + SQLite, no dependencies |
 | [`cloudflare/`](cloudflare/) | The same approval app for Cloudflare Pages + Functions + D1, so it runs on *your* account |
 | [`site/`](site/) | The aios.pages.dev landing site (static) |
@@ -37,7 +39,7 @@ Any business that sells through creators, influencers, and short-form content: c
 1. Read [`modules/00-operating-principles.md`](modules/00-operating-principles.md). It takes five minutes.
 2. Give your agent this repo and say: *"Set up aiOS for my business by following AGENT_SETUP.md."*
 3. Answer its intake questions (offer, audience, channels, budget caps).
-4. Each day, open your Content Review page and approve, edit, or send back what your agents drafted.
+4. Each day, open your Content Review page and approve, edit, or send back what your agents drafted. Keep the numbers in **Operating Sheets** (link in the header).
 
 ## Quick start (agent)
 Read [`AGENT_SETUP.md`](AGENT_SETUP.md). It's written for you.
