@@ -18,8 +18,20 @@ _lock = threading.Lock()
 
 def now(): return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
-def load_token():
-    with open(TOKEN_FILE) as f: return f.read().strip()
+def load_users():
+    """Token file: one passcode per line. 'name:passcode' gives each person their own sheets; a bare line is 'owner'.
+    Every user can review the shared content queue; Operating Sheets are saved per user."""
+    users = {}
+    with open(TOKEN_FILE) as f:
+        for ln in f:
+            ln = ln.strip()
+            if not ln or ln.startswith("#"): continue
+            name, tok = ln.split(":", 1) if ":" in ln else ("owner", ln)
+            users[tok.strip()] = name.strip()
+    if not users: raise SystemExit("token file is empty")
+    return users
+
+def load_token(): return next(iter(load_users()))
 
 def session_value(tok): return hmac.new(tok.encode(), b"aios-session", hashlib.sha256).hexdigest()
 
@@ -37,6 +49,9 @@ def init_db():
           image_path TEXT, status TEXT NOT NULL DEFAULT 'draft',
           owner_comment TEXT, operator_note TEXT, posted_url TEXT, edited_by_owner INTEGER DEFAULT 0,
           created_at TEXT, updated_at TEXT, approved_at TEXT, posted_at TEXT)""")
+        c.execute("""CREATE TABLE IF NOT EXISTS sheets(
+          user TEXT NOT NULL, tool TEXT NOT NULL, rows TEXT NOT NULL DEFAULT '[]', updated_at TEXT,
+          PRIMARY KEY(user, tool))""")
 
 def row(r):
     d = dict(r); d["parts"] = json.loads(d["parts"]) if d.get("parts") else None; return d
@@ -111,11 +126,14 @@ class H(BaseHTTPRequestHandler):
         self.end_headers(); self.wfile.write(b)
 
     def authed(self):
-        tok = load_token()
+        """Returns the user name for a valid bearer token or session cookie, else None."""
         h = self.headers.get("Authorization", "")
-        if h.startswith("Bearer ") and hmac.compare_digest(h[7:].strip(), tok): return True
         ck = SimpleCookie(self.headers.get("Cookie", ""))
-        return "aios_session" in ck and hmac.compare_digest(ck["aios_session"].value, session_value(tok))
+        sess = ck["aios_session"].value if "aios_session" in ck else None
+        for tok, name in load_users().items():
+            if h.startswith("Bearer ") and hmac.compare_digest(h[7:].strip(), tok): return name
+            if sess and hmac.compare_digest(sess, session_value(tok)): return name
+        return None
 
     def body(self):
         n = int(self.headers.get("Content-Length") or 0)
@@ -129,8 +147,19 @@ class H(BaseHTTPRequestHandler):
     def do_GET(self):
         u = urlparse(self.path); qs = parse_qs(u.query)
         if u.path in ("/", "/index.html"): return self.static("index.html", "text/html; charset=utf-8")
+        if u.path in ("/tools", "/tools.html"): return self.static("tools.html", "text/html; charset=utf-8")
+        if u.path == "/tools.json": return self.static("tools.json", "application/json")
+        if u.path == "/sheets.js": return self.static("sheets.js", "text/javascript; charset=utf-8")
         if u.path == "/healthz": return self.send_json(200, {"ok": True})
-        if not self.authed(): return self.send_json(401, {"error": "unauthorized"})
+        user = self.authed()
+        if not user: return self.send_json(401, {"error": "unauthorized"})
+        if u.path == "/api/me": return self.send_json(200, {"user": user})
+        if u.path == "/api/sheets":
+            with db() as c:
+                return self.send_json(200, [dict(r) for r in c.execute("SELECT tool, updated_at, json_array_length(rows) AS n FROM sheets WHERE user=?", (user,))])
+        if u.path.startswith("/api/sheets/"):
+            with db() as c: r = c.execute("SELECT rows, updated_at FROM sheets WHERE user=? AND tool=?", (user, u.path.split("/")[3])).fetchone()
+            return self.send_json(200, {"rows": json.loads(r["rows"]) if r else [], "updated_at": r["updated_at"] if r else None})
         if u.path == "/api/posts":
             return self.send_json(200, list_posts(qs.get("status", [None])[0], qs.get("due", ["0"])[0] == "1"))
         if u.path.startswith("/api/posts/"):
@@ -148,13 +177,32 @@ class H(BaseHTTPRequestHandler):
             self.send_response(200); self.send_header("Content-Type", ct); self.send_header("Content-Length", str(len(b))); self.end_headers(); return self.wfile.write(b)
         self.send_json(404, {"error": "not found"})
 
+    def do_PUT(self):
+        u = urlparse(self.path)
+        user = self.authed()
+        if not user: return self.send_json(401, {"error": "unauthorized"})
+        if not u.path.startswith("/api/sheets/"): return self.send_json(404, {"error": "not found"})
+        tool = u.path.split("/")[3]
+        try: b = self.body()
+        except Exception: return self.send_json(400, {"error": "bad json"})
+        rows = b.get("rows")
+        if not isinstance(rows, list) or len(rows) > 5000 or not all(isinstance(r, dict) for r in rows):
+            return self.send_json(400, {"error": "rows must be a list of objects (max 5000)"})
+        t = now()
+        with _lock, db() as c:
+            c.execute("INSERT INTO sheets(user, tool, rows, updated_at) VALUES(?,?,?,?) ON CONFLICT(user, tool) DO UPDATE SET rows=excluded.rows, updated_at=excluded.updated_at",
+                      (user, tool, json.dumps(rows, ensure_ascii=False), t))
+        return self.send_json(200, {"ok": True, "updated_at": t, "n": len(rows)})
+
     def do_POST(self):
         u = urlparse(self.path)
         try: b = self.body()
         except Exception: return self.send_json(400, {"error": "bad json"})
         if u.path == "/api/login":
-            if hmac.compare_digest(str(b.get("token", "")).strip(), load_token()):
-                return self.send_json(200, {"ok": True}, [("Set-Cookie", f"aios_session={session_value(load_token())}; HttpOnly; SameSite=Strict; Path=/; Max-Age=2592000")])
+            given = str(b.get("token", "")).strip()
+            for tok in load_users():
+                if hmac.compare_digest(given, tok):
+                    return self.send_json(200, {"ok": True}, [("Set-Cookie", f"aios_session={session_value(tok)}; HttpOnly; SameSite=Strict; Path=/; Max-Age=2592000")])
             return self.send_json(401, {"error": "wrong passcode"})
         if u.path == "/api/logout":
             return self.send_json(200, {"ok": True}, [("Set-Cookie", "aios_session=; Path=/; Max-Age=0")])

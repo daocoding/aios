@@ -22,12 +22,24 @@ function cookie(req, name) {
   const m = (req.headers.get("Cookie") || "").match(new RegExp("(?:^|;\\s*)" + name + "=([^;]+)"));
   return m ? m[1] : null;
 }
+// OWNER_TOKEN secret: a single passcode, or several "name:passcode" entries separated by newlines or commas.
+// Everyone shares the content queue; Operating Sheets are saved per user name.
+function users(env) {
+  const out = [];
+  for (let ln of String(env.OWNER_TOKEN || "").split(/[\n,]/)) {
+    ln = ln.trim(); if (!ln) continue;
+    const i = ln.indexOf(":");
+    out.push(i > 0 ? { name: ln.slice(0, i).trim(), tok: ln.slice(i + 1).trim() } : { name: "owner", tok: ln });
+  }
+  return out;
+}
 async function authed(req, env) {
-  const tok = env.OWNER_TOKEN; if (!tok) return false;
-  const h = req.headers.get("Authorization") || "";
-  if (h.startsWith("Bearer ") && safeEq(h.slice(7).trim(), tok)) return true;
-  const c = cookie(req, "aios_session");
-  return !!c && safeEq(c, await sessionValue(tok));
+  const h = req.headers.get("Authorization") || "", c = cookie(req, "aios_session");
+  for (const u of users(env)) {
+    if (h.startsWith("Bearer ") && safeEq(h.slice(7).trim(), u.tok)) return u.name;
+    if (c && safeEq(c, await sessionValue(u.tok))) return u.name;
+  }
+  return null;
 }
 const row = r => r && { ...r, parts: r.parts ? JSON.parse(r.parts) : null };
 async function getPost(db, id) {
@@ -83,13 +95,32 @@ export async function onRequest({ request, env }) {
     if (path === "/api/healthz") return json({ ok: true });
     if (request.method === "POST" && path === "/api/login") {
       const b = await request.json().catch(() => ({}));
-      if (env.OWNER_TOKEN && safeEq(String(b.token || "").trim(), env.OWNER_TOKEN))
-        return json({ ok: true }, 200, { "Set-Cookie": `aios_session=${await sessionValue(env.OWNER_TOKEN)}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=2592000` });
+      for (const u of users(env)) if (safeEq(String(b.token || "").trim(), u.tok))
+        return json({ ok: true }, 200, { "Set-Cookie": `aios_session=${await sessionValue(u.tok)}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=2592000` });
       return json({ error: "wrong passcode" }, 401);
     }
     if (request.method === "POST" && path === "/api/logout")
       return json({ ok: true }, 200, { "Set-Cookie": "aios_session=; Path=/; Max-Age=0" });
-    if (!(await authed(request, env))) return json({ error: "unauthorized" }, 401);
+    const user = await authed(request, env);
+    if (!user) return json({ error: "unauthorized" }, 401);
+    if (path === "/api/me") return json({ user });
+    if (path === "/api/sheets" && request.method === "GET")
+      return json((await db.prepare("SELECT tool, updated_at, json_array_length(rows) AS n FROM sheets WHERE user=?1").bind(user).all()).results);
+    const sm = path.match(/^\/api\/sheets\/([\w-]+)$/);
+    if (sm && request.method === "GET") {
+      const r = await db.prepare("SELECT rows, updated_at FROM sheets WHERE user=?1 AND tool=?2").bind(user, sm[1]).first();
+      return json({ rows: r ? JSON.parse(r.rows) : [], updated_at: r ? r.updated_at : null });
+    }
+    if (sm && request.method === "PUT") {
+      const b = await request.json().catch(() => null);
+      const rows = b && b.rows;
+      if (!Array.isArray(rows) || rows.length > 5000 || !rows.every(r => r && typeof r === "object" && !Array.isArray(r)))
+        return json({ error: "rows must be a list of objects (max 5000)" }, 400);
+      const t = now();
+      await db.prepare("INSERT INTO sheets(user, tool, rows, updated_at) VALUES(?1,?2,?3,?4) ON CONFLICT(user, tool) DO UPDATE SET rows=excluded.rows, updated_at=excluded.updated_at")
+        .bind(user, sm[1], JSON.stringify(rows), t).run();
+      return json({ ok: true, updated_at: t, n: rows.length });
+    }
 
     if (request.method === "GET") {
       if (path === "/api/posts") {
