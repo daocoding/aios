@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>aiOS Grok Edition: the verified growth operating system for the creator economy</title>
+<meta name="description" content="An open, agent-runnable operating system for businesses that grow through creators and short-form content. Agents execute. You decide. Every bet is tested before it scales.">
+<meta property="og:title" content="aiOS Grok Edition">
+<meta property="og:description" content="Replace “I think” with “I verified.” An open operating system your agents can run, with you approving every step.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 5'%3E%3Cpath d='M0 0h3v1H0zM0 1h1v1H0zM0 2h3v1H0zM0 3h1v1H0zM2 3h1v1H2zM0 4h3v1H0zM2 1h1v1H2z' fill='%23111'/%3E%3C/svg%3E">
+<style>
+:root{--ink:#111316;--soft:#4a4f57;--mute:#8a9099;--line:#e6e8eb;--bg:#fbfbfa;--card:#fff;--accent:#0f766e;--accent2:#e8f5f3;--warm:#b45309}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;font:17px/1.6 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Inter,Roboto,sans-serif;color:var(--ink);background:var(--bg)}
+a{color:var(--accent)}code,pre{font:14px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+nav{position:sticky;top:0;background:rgba(251,251,250,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);z-index:5}
+nav .wrap{display:flex;align-items:center;gap:20px;height:60px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;text-decoration:none;color:var(--ink)}
+.logo{display:grid;grid-template-columns:repeat(3,6px);gap:1.5px}.logo i{width:6px;height:6px;background:var(--ink)}.logo i.o{background:transparent}.logo i.g{background:var(--mute)}
+nav .links{margin-left:auto;display:flex;gap:22px;font-size:15px}nav .links a{color:var(--soft);text-decoration:none}nav .links a:hover{color:var(--ink)}
+.btn{display:inline-block;padding:12px 20px;border-radius:10px;background:var(--ink);color:#fff;text-decoration:none;font-weight:600;font-size:16px}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+header.hero{padding:96px 0 72px}
+.eyebrow{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:700}
+h1{font-size:clamp(38px,6vw,64px);line-height:1.05;letter-spacing:-.025em;margin:14px 0 20px;max-width:900px}
+h1 em{font-style:normal;color:var(--accent)}
+.lead{font-size:20px;color:var(--soft);max-width:720px}
+.cta{display:flex;gap:12px;margin-top:30px;flex-wrap:wrap}
+.formula{margin-top:56px;display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--card)}
+.formula div{padding:20px;border-right:1px solid var(--line)}.formula div:last-child{border:0}
+.formula b{display:block;font-size:13px;color:var(--mute);font-weight:600}.formula span{font-size:18px;font-weight:650}
+section{padding:80px 0;border-top:1px solid var(--line)}
+h2{font-size:clamp(28px,3.6vw,40px);letter-spacing:-.02em;line-height:1.15;margin:0 0 14px}
+.sub{color:var(--soft);max-width:720px;margin:0 0 40px}
+.grid{display:grid;gap:16px}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px}
+.card h3{margin:0 0 6px;font-size:18px}.card p{margin:0;color:var(--soft);font-size:15.5px}
+.num{font:600 13px ui-monospace,monospace;color:var(--accent);background:var(--accent2);padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:12px}
+table{width:100%;border-collapse:collapse;font-size:15.5px;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+th,td{padding:14px 18px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}th{font-size:13px;color:var(--mute);text-transform:uppercase;letter-spacing:.06em}
+tr:last-child td{border:0}td.r{color:#9a3412}td.v{color:#0f766e}
+.beats{display:grid;grid-template-columns:3fr 8fr 4fr;gap:6px;margin-top:8px}
+.beat{border-radius:12px;padding:20px;color:#fff}.beat small{opacity:.8;font-weight:600}.beat h3{margin:4px 0;color:#fff}.beat p{margin:0;color:rgba(255,255,255,.88);font-size:15px}
+.b1{background:#0f172a}.b2{background:#0f766e}.b3{background:#b45309}
+.stages{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.loop{display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-weight:600}.loop span{background:var(--card);border:1px solid var(--line);padding:10px 14px;border-radius:999px}.loop i{color:var(--mute);font-style:normal}
+pre{background:#0f1115;color:#e7e9ee;padding:22px;border-radius:14px;overflow:auto}
+.rules{columns:2;column-gap:40px;padding-left:20px}.rules li{margin-bottom:10px;break-inside:avoid}
+footer{padding:48px 0;border-top:1px solid var(--line);color:var(--mute);font-size:14px}
+footer .wrap{display:flex;gap:20px;flex-wrap:wrap;align-items:center}
+@media(max-width:860px){.g2,.g3,.stages,.formula{grid-template-columns:1fr}.formula div{border-right:0;border-bottom:1px solid var(--line)}.beats{grid-template-columns:1fr}.rules{columns:1}nav .links a.hide{display:none}}
+</style>
+</head>
+<body>
+<nav><div class="wrap">
+  <a class="brand" href="#"><div class="logo" id="logo"></div>aiOS <span style="font-weight:500;color:var(--mute)">Grok Edition</span></a>
+  <div class="links"><a class="hide" href="#method">Method</a><a class="hide" href="#modules">Modules</a><a class="hide" href="#review">Approval</a><a href="#start">Get started</a><a href="https://github.com/daocoding/aios">GitHub</a></div>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Open source · Agent-runnable · Built for the creator economy</div>
+  <h1>Replace “I think” with <em>“I verified.”</em></h1>
+  <p class="lead">aiOS is an operating system your AI agents run for any business that grows through creators, influencers, and short-form content. Agents research, draft, and diagnose. You approve every step. Each bet gets tested small before it's scaled big.</p>
+  <div class="cta"><a class="btn" href="#start">Set up with your agent</a><a class="btn ghost" href="https://github.com/daocoding/aios">Read the code</a></div>
+  <div class="formula">
+    <div><b>01</b><span>Real problem</span></div>
+    <div><b>02</b><span>Key hypotheses</span></div>
+    <div><b>03</b><span>Minimum test</span></div>
+    <div><b>04</b><span>Scaled replication</span></div>
+  </div>
+</div></header>
+
+<section id="why"><div class="wrap">
+  <h2>Effort isn't the bottleneck. Decision quality is.</h2>
+  <p class="sub">Most creator-led growth stalls for the same reason: teams work hard on problems that were never defined, and spend money without learning what went wrong. aiOS makes the difference between two kinds of operator explicit, then hands the verified path to your agents.</p>
+  <table>
+    <tr><th>Situation</th><th>Reactive operator</th><th>Verified operator</th></tr>
+    <tr><td>Choosing what to sell</td><td class="r">Copies last year's bestseller</td><td class="v">Tests demand with the target audience in a small batch first</td></tr>
+    <tr><td>Creators don't reply</td><td class="r">Swaps the person doing outreach</td><td class="v">Diagnoses: profile → opening line → reason to partner → commission → product</td></tr>
+    <tr><td>Video gets no sales</td><td class="r">Re-edits faster</td><td class="v">Checks hook, proof, scene, and call to action against a known structure</td></tr>
+    <tr><td>Ads below target</td><td class="r">Kills the campaign or adds budget</td><td class="v">Knows the growth stage; checks target → activation → creative → page</td></tr>
+    <tr><td>Big decisions</td><td class="r">Made at the peak of a heated meeting</td><td class="v">Made next session, with a checklist and three independent signals</td></tr>
+  </table>
+</div></section>
+
+<section id="method"><div class="wrap">
+  <h2>The method, in four ideas</h2>
+  <p class="sub">The full theory, with principles, six traps, frameworks, and decision rules, lives in <a href="https://github.com/daocoding/aios/blob/main/docs/METHODOLOGY.md">METHODOLOGY.md</a>. Here's the shape of it.</p>
+  <div class="grid g2">
+    <div class="card"><span class="num">Value, not cost</span><h3>Price from the pain, not the factory</h3><p>Cost sets your floor and value sets your ceiling. Score every offer on three axes: how expensive the pain is, the true margin after every fee, and whether the core difference can be shown in 20 seconds.</p></div>
+    <div class="card"><span class="num">One variable</span><h3>Test small, test single</h3><p>Hold everything fixed except the one thing you're learning about. Write the kill criterion before you spend. Run a 30-day sprint, and commit only after engagement, creator feedback, and real purchases all agree.</p></div>
+    <div class="card"><span class="num">Assets, not posts</span><h3>Creators teach you what sells</h3><p>The first creator wave buys learning and reusable assets, not sales. Every winning piece is broken down into hook, proof, scene, and call to action, then recombined and remade until it stops working.</p></div>
+    <div class="card"><span class="num">Humans decide</span><h3>No SOP, no agent</h3><p>Humans set standards and make decisions. Agents run the process and keep the learning. Anything you can write down, an agent can run, so capability belongs to the company, not to one person.</p></div>
+  </div>
+  <h3 style="margin:48px 0 6px">Three-Beat Resonance: the structure of a short video that sells</h3>
+  <p class="sub" style="margin-bottom:12px">Every beat is required, they always come in this order, and each video makes one selling point.</p>
+  <div class="beats">
+    <div class="beat b1"><small>0–3s</small><h3>Stop</h3><p>A relatable hook or rising pain that stops the scroll.</p></div>
+    <div class="beat b2"><small>3–11s</small><h3>Believe</h3><p>Demo, proof, before and after, in the real scene where it's used, with credible social proof.</p></div>
+    <div class="beat b3"><small>11–15s</small><h3>Act</h3><p>The offer, a reason to act now, and a clear instruction.</p></div>
+  </div>
+  <h3 style="margin:48px 0 16px">Paid growth has stages, and each one has its own rules</h3>
+  <div class="stages">
+    <div class="card"><span class="num">0 → 1 · Validate</span><p>Let the system learn who buys. Aim for about 50 conversions and don't judge the project on early ROI.</p></div>
+    <div class="card"><span class="num">1 → 10 · Replicate</span><p>Build a matrix of creatives. Put budget behind proven performers, and keep the awareness-building videos running.</p></div>
+    <div class="card"><span class="num">10 → 100 · Scale</span><p>Run paid as a shared service. Scale comes from the number of proven creatives, not just the budget.</p></div>
+  </div>
+</div></section>
+
+<section id="modules"><div class="wrap">
+  <h2>Nine modules your agent can run today</h2>
+  <p class="sub">Each module has the same structure: purpose, inputs, procedure, decision rules, outputs, a human approval gate, and a system prompt you can paste in.</p>
+  <div class="grid g3">
+    <div class="card"><span class="num">00</span><h3>Operating principles</h3><p>Four questions to answer before any decision, and six traps to flag.</p></div>
+    <div class="card"><span class="num">01</span><h3>Opportunity &amp; offer fit</h3><p>Market stage, a pain map from reviews, value-based pricing, unit economics, and a 30-day test.</p></div>
+    <div class="card"><span class="num">02</span><h3>Creator partnerships</h3><p>Briefs for each audience segment, short outreach people actually read, and long-term partner relationships.</p></div>
+    <div class="card"><span class="num">03</span><h3>Content engine</h3><p>A hook library, recombined variants, weekly selling-point sprints, and remaking winners.</p></div>
+    <div class="card"><span class="num">04</span><h3>Paid amplification</h3><p>Rules for each stage and a fixed order of diagnosis. Every creative gets a priority: fix now, watch, or leave alone.</p></div>
+    <div class="card"><span class="num">05</span><h3>Measure &amp; learn</h3><p>A hypothesis ledger, kill criteria, and weekly reviews that feed back into the playbooks.</p></div>
+    <div class="card"><span class="num">06</span><h3>Operating cadence</h3><p>Daily stand-ups and approvals, the weekly rhythm, and the 30-day sprint.</p></div>
+    <div class="card"><span class="num">07</span><h3>AI-native team</h3><p>A manual for each role, a maturity ladder from L1 to L4, and adoption in stages.</p></div>
+    <div class="card"><span class="num">08</span><h3>Channel flywheel</h3><p>Creator platforms spark demand, marketplaces capture it, and your own store compounds it.</p></div>
+  </div>
+</div></section>
+
+<section id="review"><div class="wrap">
+  <h2>The human approval step, built in</h2>
+  <p class="sub">Your agents put every post, video script, and creator message into a review queue. You see one compact, full-width row per item. Select all, bulk-approve, edit inline, or send something back with a comment. Your agent publishes only what you approved.</p>
+  <div class="loop"><span>Agent drafts</span><i>→</i><span>Queue</span><i>→</i><span>You approve, edit, or send back</span><i>→</i><span>Agent publishes</span><i>→</i><span>Results logged</span><i>→</i><span>Hypothesis updated</span></div>
+  <div class="grid g2" style="margin-top:28px">
+    <div class="card"><h3>Your account, your data</h3><p>Deploy the queue to your own Cloudflare account (Pages + Functions + D1, free tier friendly). aios.pages.dev is the project's home and hosted version.</p></div>
+    <div class="card"><h3>Zero-dependency option</h3><p>Prefer to run it locally? The Python version uses only the standard library and SQLite, so it runs on any laptop or small server.</p></div>
+  </div>
+</div></section>
+
+<section id="start"><div class="wrap">
+  <h2>Get started in one sentence</h2>
+  <p class="sub">Give your agent this sentence. AGENT_SETUP.md is written for the agent to follow. It will ask you a few questions, deploy your approval page to your own Cloudflare account, and start the first 30-day sprint.</p>
+<pre>Set up aiOS for my business by following
+https://github.com/daocoding/aios/blob/main/AGENT_SETUP.md</pre>
+  <h3 style="margin-top:40px">Fifteen decision rules to keep on your desk</h3>
+  <ol class="rules">
+    <li>Don't decide until the real problem is written as a cause-and-effect claim you can test.</li>
+    <li>Test one variable at a time. Write the kill criterion before you spend.</li>
+    <li>Don't make a large commitment on fewer than three independent signals.</li>
+    <li>Don't make directional decisions at an emotional high or low.</li>
+    <li>Every new market, audience, or channel is a new hypothesis.</li>
+    <li>If the value gap is large, prioritize the offer. If it's moderate, use it to bring in traffic. If it's negative, drop it.</li>
+    <li>Start with a small batch and a 30-day sprint. Scale only after the content converts.</li>
+    <li>If fewer than 90% of creators who get samples post content, fix who you pick or your terms first.</li>
+    <li>One selling point per video, always in the order Stop → Believe → Act.</li>
+    <li>In early paid tests, optimize for learning, not ROI.</li>
+    <li>When results are below break-even, check in order: target → activation → creative → page.</li>
+    <li>Put budget behind proven performers, and keep awareness-building videos running.</li>
+    <li>Keep remaking a winner until it stops working, not until you're bored of it.</li>
+    <li>Every plan survives three "why?"s and includes a Plan B and a Plan C.</li>
+    <li>If you can't write the SOP, you can't hand the job to an agent.</li>
+  </ol>
+</div></section>
+
+<footer><div class="wrap">
+  <div class="brand"><div class="logo" id="logo2"></div>G8 · Group of 8</div>
+  <span>Built in the open by a small US team that builds products and people. Science, theory, and logic, applied with care.</span>
+  <span style="margin-left:auto"><a href="https://github.com/daocoding/aios">GitHub</a> · MIT License</span>
+</div></footer>
+<script>
+const L=[1,1,1,1,0,2,1,1,1,1,0,1,1,1,1];
+for(const id of ['logo','logo2'])document.getElementById(id).innerHTML=L.map(v=>`<i class="${v==0?'o':v==2?'g':''}"></i>`).join('');
+</script>
+</body>
+</html>
