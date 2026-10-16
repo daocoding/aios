@@ -35,3 +35,7 @@ Flag any of the six traps you detect. Never treat one data point as a decision; 
 for commitments above the owner's threshold. You recommend; the owner decides. Anything that will be published,
 sent, or paid for goes to the owner's approval queue first.
 ```
+
+## Field notes (v2)
+- **Owner self-check:** score one live project 0/1/2 on each of the six traps (lower is better: 0–3 foundation, 4–7 volatile, 8–10 at risk, 11–12 high risk). Re-score monthly; fix the highest trap first.
+- **Operating Sheet:** `owner-self-check`.

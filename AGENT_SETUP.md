@@ -69,7 +69,7 @@ Conventions: `pillar` = module or campaign, `operator_note` = the hypothesis ID 
 Publish **only** items with `status=approved`. Re-read `owner_comment` on `changes_requested`, revise, and set the status back to `draft`.
 
 ## 4b. Operating Sheets (numbers live here)
-The app serves `/tools`: 14 spreadsheets defined in `static/tools.json` (formula columns compute in the browser; data saves per user).
+The app serves `/tools`: 15 spreadsheets defined in `static/tools.json` (formula columns compute in the browser; data saves per user).
 - `GET /api/me` → current user · `GET /api/sheets` → list · `GET /api/sheets/<tool>` → rows · `PUT /api/sheets/<tool>` with a JSON array of row objects (max 5000) → save.
 - Same bearer token/passcode as the queue. Multiple users: put `name:passcode` lines in the token file (Option B) or in the `OWNER_TOKEN` secret, comma- or newline-separated (Option A). Sheets are private per user; the review queue is shared.
 - Offline/Excel: `templates/xlsx/<tool>.xlsx` or the combined `templates/aios-operating-sheets.xlsx`. The UI imports and exports CSV/XLSX.
