@@ -1,0 +1,7 @@
+data/
+__pycache__/
+*.db
+owner_token
+.wrangler/
+node_modules/
+.dev.vars
