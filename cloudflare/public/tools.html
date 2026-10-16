@@ -28,7 +28,7 @@ tfoot td{background:#fafafa;font-weight:600;padding:7px 8px}
 #login{max-width:340px;margin:12vh auto;background:var(--card);padding:24px;border:1px solid var(--line);border-radius:12px}#login input{width:100%;padding:10px;margin:10px 0;border:1px solid var(--line);border-radius:8px}
 @media(max-width:800px){.layout{grid-template-columns:1fr}aside{display:flex;overflow:auto;gap:4px}aside button{white-space:nowrap;width:auto}}
 </style></head><body>
-<header><div class="logo" id="logo"></div><h1>aiOS <span style="color:var(--mute);font-weight:500">Operating Sheets</span></h1><span class="sp"></span><a href="/">Content Review</a><span id="who" style="color:var(--mute)"></span></header>
+<header><div class="logo" id="logo"></div><h1>aiOS <span style="color:var(--mute);font-weight:500">Operating Sheets</span></h1><span class="sp"></span><label style="color:var(--soft)">Offer type <select id="otype" onchange="setSetting('offer_type',this.value)"><option value="physical">Physical goods</option><option value="digital">Digital / app / course</option><option value="service">Service</option><option value="local">Local business</option></select></label><label style="color:var(--soft)">Currency <select id="curr" onchange="setSetting('currency',this.value)"><option>$</option><option>€</option><option>£</option><option>¥</option><option>₹</option><option>R$</option><option>A$</option><option>C$</option><option>CHF </option><option>kr </option></select></label><a href="/">Content Review</a><span id="who" style="color:var(--mute)"></span></header>
 <div id="login" hidden><h3>Passcode</h3><input id="pw" type="password" placeholder="Passcode"><button class="btn pri" onclick="login()">Unlock</button><p id="lerr" style="color:var(--bad)"></p></div>
 <div class="layout" id="app" hidden><aside id="nav"></aside><main id="main"></main></div>
 <input type="file" id="file" accept=".csv,.xlsx" hidden>
@@ -36,22 +36,26 @@ tfoot td{background:#fafafa;font-weight:600;padding:7px 8px}
 <script>
 const S=window.AIOS_SHEETS,$=s=>document.querySelector(s);
 const L=[1,1,1,1,0,2,1,1,1,1,0,1,1,1,1];$('#logo').innerHTML=L.map(v=>`<i class="${v==0?'o':v==2?'g':''}"></i>`).join('');
-let TOOLS=[],cur=null,rows=[],dirty=false,saveT=null;
+let TOOLS=[],cur=null,rows=[],dirty=false,saveT=null,base=null,SET={currency:'$',offer_type:'physical'};
+const START=[['Day 1','owner-self-check','Score your decision habits'],['Day 1','unit-economics','Know your margin and break-even ROAS'],['Days 1-3','offer-scorecard','Score the offer; check cash exposure'],['Days 1-3','launch-plan','Write the kickoff plan'],['Week 1','selling-points','List and grade every selling point'],['Week 1','creator-pipeline','Start creator outreach'],['Weeks 2-4','asset-log','Log every asset; triage P0/P1/P2'],['Weeks 2-4','ad-diagnosis','Amplify proven assets'],['Weekly','hypothesis-ledger','Keep / kill / scale'],['Weekly','weekly-review','Retrospective']];
+const lab=c=>{let l=(c.alt&&c.alt[SET.offer_type])||c.label;return l.replace(/\(\$\)/g,'('+SET.currency.trim()+')').replace(/ \$\)/g,' '+SET.currency.trim()+')')};
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-async function api(m,p,b){const r=await fetch(p,{method:m,headers:{'Content-Type':'application/json'},body:b?JSON.stringify(b):undefined});if(r.status==401){show(false);throw 0}return r.json()}
+async function api(m,p,b){const r=await fetch(p,{method:m,headers:{'Content-Type':'application/json'},body:b?JSON.stringify(b):undefined});if(r.status==401){show(false);throw 0}const j=await r.json();if(r.status==409){j.conflict=true}return j}
+async function setSetting(k,v){SET=await api('PUT','/api/settings',{[k]:v});S.currency=SET.currency;if(cur)render(base)}
 function show(ok){$('#login').hidden=ok;$('#app').hidden=!ok}
 async function login(){const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:$('#pw').value})});if(r.ok){$('#pw').value='';init()}else $('#lerr').textContent='Wrong passcode'}
 $('#pw').addEventListener('keydown',e=>e.key=='Enter'&&login());
 async function init(){
   TOOLS=(await (await fetch('tools.json')).json()).tools;
   let me;try{me=await api('GET','/api/me')}catch{return}show(true);$('#who').textContent='· '+me.user;
-  $('#nav').innerHTML=TOOLS.map(t=>`<button data-id="${t.id}" onclick="openTool('${t.id}')"><small>${t.module}</small>${esc(t.title)}</button>`).join('');
+  SET=await api('GET','/api/settings');S.currency=SET.currency;$('#otype').value=SET.offer_type;$('#curr').value=SET.currency;
+  $('#nav').innerHTML=`<details open style="margin-bottom:8px"><summary style="cursor:pointer;font-weight:600;padding:6px 10px">Start here: 30-day path</summary>${START.map(([d,id,w])=>`<button onclick="openTool('${id}')"><small>${d}</small>${esc(w)}</button>`).join('')}</details><div style="font-weight:600;padding:6px 10px">All sheets</div>`+TOOLS.map(t=>`<button data-id="${t.id}" onclick="openTool('${t.id}')"><small>${t.module}</small>${esc(t.title)}</button>`).join('');
   openTool(location.hash.slice(1)||TOOLS[0].id);
 }
 async function openTool(id){
   if(dirty)await save();cur=TOOLS.find(t=>t.id==id)||TOOLS[0];location.hash=cur.id;
-  document.querySelectorAll('aside button').forEach(b=>b.classList.toggle('on',b.dataset.id==cur.id));
-  const d=await api('GET','/api/sheets/'+cur.id);rows=d.rows||[];render(d.updated_at);
+  document.querySelectorAll('aside button[data-id]').forEach(b=>b.classList.toggle('on',b.dataset.id==cur.id));
+  const d=await api('GET','/api/sheets/'+cur.id+'?raw=1');rows=d.rows||[];base=d.updated_at;render(d.updated_at);
 }
 function typeOf(c){return c.type=='formula'?(c.fmt||'text'):c.type}
 function cls(v){v=String(v);return /^P0|Drop|Need|Over|Missing|ERR/.test(v)?'p0':/^P1|Thin|Check/.test(v)?'p1':/^P2|Profit|OK|Yes|Scale/.test(v)?'ok':''}
@@ -63,7 +67,7 @@ function render(upd){
   ${t.sample?'<button class="btn" onclick="loadSample()">Insert example rows</button>':''}<button class="btn" onclick="clearAll()">Clear</button>
   <span class="status" id="st">${upd?'Saved '+new Date(upd).toLocaleString():'Not saved yet'}</span></div>
   <div class="kpis" id="kpis"></div>
-  <div class="wrap"><table><thead><tr>${t.columns.map(c=>`<th class="${c.type=='formula'?'f':''}" style="min-width:${c.w||110}px" title="${c.type=='formula'?esc('= '+c.f):''}">${esc(c.label)}${c.type=='formula'?' ƒ':''}</th>`).join('')}<th></th></tr></thead>
+  <div class="wrap"><table><thead><tr>${t.columns.map(c=>`<th class="${c.type=='formula'?'f':''}" style="min-width:${c.w||110}px" title="${c.type=='formula'?esc('= '+c.f):''}">${esc(lab(c))}${c.type=='formula'?' ƒ':''}</th>`).join('')}<th></th></tr></thead>
   <tbody id="tb"></tbody><tfoot id="tf"></tfoot></table></div>`;
   body();
 }
@@ -82,7 +86,7 @@ function body(){
 function foot(cr){
   const t=cur;
   if(t.totals)$('#tf').innerHTML='<tr>'+t.columns.map(c=>{const a=t.totals[c.key];if(!a)return'<td></td>';const v=a=='COUNT'?cr.filter(r=>r[c.key]!==''&&r[c.key]!=null).length:cr.reduce((s,r)=>s+(+r[c.key]||0),0);return `<td>${a=='COUNT'?v+' rows':S.fmt(v,typeOf(c))}</td>`}).join('')+'<td></td></tr>';else $('#tf').innerHTML='';
-  $('#kpis').innerHTML=(t.kpis||[]).map(k=>`<div class="kpi"><b>${S.fmt(S.kpi(k.f,cr),k.fmt)}</b><span>${esc(k.label)}</span></div>`).join('');
+  $('#kpis').innerHTML=(t.kpis||[]).map(k=>`<div class="kpi"><b>${S.fmt(S.kpi(k.f,cr),k.fmt)}</b><span>${esc((k.alt&&k.alt[SET.offer_type])||k.label)}</span></div>`).join('');
 }
 document.addEventListener('change',e=>{const el=e.target;if(el.dataset.k==null||el.dataset.i==null)return;const c=cur.columns.find(c=>c.key==el.dataset.k);if(!c||!rows[+el.dataset.i])return;
   rows[+el.dataset.i][c.key]=S.parseInput(el.value,c.type);refreshRow(+el.dataset.i);touch()});
@@ -91,7 +95,9 @@ function refreshRow(i){const r=S.computeRow(cur,rows[i]);const tr=$(`#tb tr[data
   cur.columns.filter(c=>c.type=='formula').forEach(c=>{const td=tr.querySelector(`td[data-k="${c.key}"]`);td.textContent=S.fmt(r[c.key],typeOf(c));td.className='f '+cls(r[c.key])});
   foot(rows.map(r=>S.computeRow(cur,r)))}
 function touch(){dirty=true;$('#st').textContent='Saving…';clearTimeout(saveT);saveT=setTimeout(save,700)}
-async function save(){if(!cur)return;const d=await api('PUT','/api/sheets/'+cur.id,{rows});dirty=false;$('#st').textContent='Saved '+new Date(d.updated_at).toLocaleString()}
+async function save(){if(!cur)return;const d=await api('PUT','/api/sheets/'+cur.id,{rows,base_updated_at:base});
+  if(d.conflict){$('#st').textContent='Conflict: changed elsewhere';if(confirm('This sheet was changed elsewhere (another tab or an agent).\nOK = reload their version (your unsaved edits are lost)\nCancel = overwrite with your version')){dirty=false;const r=await api('GET','/api/sheets/'+cur.id+'?raw=1');rows=r.rows||[];base=r.updated_at;render(base)}else{base=d.updated_at;return save()}return}
+  dirty=false;base=d.updated_at;$('#st').textContent='Saved '+new Date(d.updated_at).toLocaleString()}
 function addRow(){rows.push({});body();touch();const tb=$('#tb');tb.lastElementChild?.querySelector('input,select')?.focus()}
 function delRow(i){rows.splice(i,1);body();touch()}
 function loadSample(){rows=rows.concat(JSON.parse(JSON.stringify(cur.sample)));body();touch()}
@@ -101,8 +107,8 @@ function exp(kind){const cr=rows.map(r=>S.computeRow(cur,r));
   if(kind=='csv')dl(new Blob([S.toCSV(cur,cr)],{type:'text/csv'}),`aios-${cur.id}.csv`);else dl(S.toXLSX(cur,rows),`aios-${cur.id}.xlsx`)}
 function importFile(){$('#file').value='';$('#file').click()}
 $('#file').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;
-  try{const m=f.name.endsWith('.xlsx')?await S.readXLSX(await f.arrayBuffer()):S.parseCSV(await f.text());
-    const add=S.matrixToRows(cur,m);if(!add.length)return alert('No rows found. The first row must contain column names.');
+  try{const m=f.name.endsWith('.xlsx')?await S.readXLSX(await f.arrayBuffer(),cur):S.parseCSV(await f.text());
+    const add=S.matrixToRows(cur,m,lab);if(!add.length)return alert('No rows found. The first row must contain column names.');
     const mode=confirm(`Import ${add.length} rows.\nOK = append, Cancel = replace existing rows`);rows=mode?rows.concat(add):add;body();touch()}
   catch(err){alert('Import failed: '+err)}});
 window.addEventListener('hashchange',()=>{const id=location.hash.slice(1);if(cur&&id!=cur.id)openTool(id)});

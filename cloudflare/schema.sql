@@ -11,3 +11,7 @@ CREATE INDEX IF NOT EXISTS posts_status ON posts(status, scheduled_at);
 CREATE TABLE IF NOT EXISTS sheets(
   user TEXT NOT NULL, tool TEXT NOT NULL, rows TEXT NOT NULL DEFAULT '[]', updated_at TEXT,
   PRIMARY KEY(user, tool));
+
+CREATE TABLE IF NOT EXISTS settings(user TEXT PRIMARY KEY, data TEXT NOT NULL DEFAULT '{}');
+CREATE TABLE IF NOT EXISTS login_fails(ip TEXT NOT NULL, ts INTEGER NOT NULL);
+CREATE INDEX IF NOT EXISTS login_fails_ip ON login_fails(ip);

@@ -1,5 +1,11 @@
 // aiOS Content Review: Cloudflare Pages Function (D1). API-compatible with apps/content-review/app.py.
 // Bindings: DB (D1), OWNER_TOKEN (secret). Images: set image_path to an https:// URL (e.g. R2 public URL).
+import { computeRow, kpis } from "../../lib/engine.js";
+import SPEC from "../../lib/spec.js";
+const TOOLS = Object.fromEntries(SPEC.tools.map(t => [t.id, t]));
+const CURRENCIES = ["$", "€", "£", "¥", "₹", "R$", "A$", "C$", "CHF ", "kr "], OFFER_TYPES = ["physical", "digital", "service", "local"];
+const MAX_FAILS = 5, FAIL_WINDOW_S = 600;
+const nowMs = () => new Date().toISOString().replace(/Z$/, "+00:00");
 const STATUSES = ["draft", "approved", "changes_requested", "skipped", "posted"];
 const EDITABLE = ["account", "pillar", "scheduled_at", "text", "parts", "image_path", "status", "owner_comment", "operator_note", "posted_url"];
 const now = () => new Date().toISOString().replace(/\.\d+Z$/, "+00:00");
@@ -94,9 +100,17 @@ export async function onRequest({ request, env }) {
   try {
     if (path === "/api/healthz") return json({ ok: true });
     if (request.method === "POST" && path === "/api/login") {
+      const ip = request.headers.get("CF-Connecting-IP") || "local", t0 = Math.floor(Date.now() / 1000);
+      await db.prepare("DELETE FROM login_fails WHERE ts < ?1").bind(t0 - FAIL_WINDOW_S).run();
+      const nf = (await db.prepare("SELECT COUNT(*) AS n, MIN(ts) AS first FROM login_fails WHERE ip=?1").bind(ip).first()) || { n: 0 };
+      if (nf.n >= MAX_FAILS) return json({ error: "too many failed attempts; try again later" }, 429, { "Retry-After": String(FAIL_WINDOW_S - (t0 - nf.first) + 1) });
       const b = await request.json().catch(() => ({}));
-      for (const u of users(env)) if (safeEq(String(b.token || "").trim(), u.tok))
+      for (const u of users(env)) if (safeEq(String((b && b.token) || "").trim(), u.tok)) {
+        await db.prepare("DELETE FROM login_fails WHERE ip=?1").bind(ip).run();
         return json({ ok: true }, 200, { "Set-Cookie": `aios_session=${await sessionValue(u.tok)}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=2592000` });
+      }
+      await db.prepare("INSERT INTO login_fails(ip, ts) VALUES(?1, ?2)").bind(ip, t0).run();
+      await new Promise(r => setTimeout(r, 1000));
       return json({ error: "wrong passcode" }, 401);
     }
     if (request.method === "POST" && path === "/api/logout")
@@ -104,19 +118,42 @@ export async function onRequest({ request, env }) {
     const user = await authed(request, env);
     if (!user) return json({ error: "unauthorized" }, 401);
     if (path === "/api/me") return json({ user });
+    if (path === "/api/settings") {
+      const r = await db.prepare("SELECT data FROM settings WHERE user=?1").bind(user).first();
+      const cur = { currency: "$", offer_type: "physical", ...(r ? JSON.parse(r.data) : {}) };
+      if (request.method === "GET") return json(cur);
+      if (request.method === "PUT") {
+        const b = await request.json().catch(() => null);
+        if (!b || typeof b !== "object" || Array.isArray(b)) return json({ error: "body must be an object" }, 400);
+        if ("currency" in b) { if (!CURRENCIES.includes(b.currency)) return json({ error: "currency must be one of " + CURRENCIES.join(", ") }, 400); cur.currency = b.currency; }
+        if ("offer_type" in b) { if (!OFFER_TYPES.includes(b.offer_type)) return json({ error: "offer_type must be one of " + OFFER_TYPES.join(", ") }, 400); cur.offer_type = b.offer_type; }
+        await db.prepare("INSERT INTO settings(user, data) VALUES(?1,?2) ON CONFLICT(user) DO UPDATE SET data=excluded.data").bind(user, JSON.stringify(cur)).run();
+        return json(cur);
+      }
+    }
     if (path === "/api/sheets" && request.method === "GET")
-      return json((await db.prepare("SELECT tool, updated_at, json_array_length(rows) AS n FROM sheets WHERE user=?1").bind(user).all()).results);
-    const sm = path.match(/^\/api\/sheets\/([\w-]+)$/);
+      return json((await db.prepare("SELECT tool, updated_at, json_array_length(rows) AS n FROM sheets WHERE user=?1 ORDER BY tool").bind(user).all()).results);
+    const sm = path.match(/^\/api\/sheets\/([^/]+)$/);
+    if (sm && !TOOLS[sm[1]]) return json({ error: `unknown tool '${sm[1]}'`, tools: Object.keys(TOOLS).sort() }, 404);
     if (sm && request.method === "GET") {
       const r = await db.prepare("SELECT rows, updated_at FROM sheets WHERE user=?1 AND tool=?2").bind(user, sm[1]).first();
-      return json({ rows: r ? JSON.parse(r.rows) : [], updated_at: r ? r.updated_at : null });
+      const rows = r ? JSON.parse(r.rows) : [], out = { tool: sm[1], rows, updated_at: r ? r.updated_at : null };
+      if (u.searchParams.get("raw") !== "1") { const t = TOOLS[sm[1]]; out.computed = rows.map(x => computeRow(t, x)); out.kpis = kpis(t, rows); }
+      return json(out);
     }
     if (sm && request.method === "PUT") {
+      // Accept a bare JSON array of row objects, or {"rows": [...], "base_updated_at": "..."}.
       const b = await request.json().catch(() => null);
-      const rows = b && b.rows;
+      let rows = null, base = request.headers.get("If-Match");
+      if (Array.isArray(b)) rows = b; else if (b && typeof b === "object") { rows = b.rows; if (b.base_updated_at) base = b.base_updated_at; }
       if (!Array.isArray(rows) || rows.length > 5000 || !rows.every(r => r && typeof r === "object" && !Array.isArray(r)))
-        return json({ error: "rows must be a list of objects (max 5000)" }, 400);
-      const t = now();
+        return json({ error: 'body must be a JSON array of row objects, or {"rows": [...]} (max 5000 rows)' }, 400);
+      const keys = new Set(TOOLS[sm[1]].columns.filter(c => c.type !== "formula").map(c => c.key));
+      rows = rows.map(r => Object.fromEntries(Object.entries(r).filter(([k]) => keys.has(k))));
+      const cur = await db.prepare("SELECT updated_at FROM sheets WHERE user=?1 AND tool=?2").bind(user, sm[1]).first();
+      if (base && (cur ? cur.updated_at : "") !== base.replace(/"/g, ""))
+        return json({ error: "conflict: sheet changed since base_updated_at; reload and retry", updated_at: cur ? cur.updated_at : null }, 409);
+      const t = nowMs();
       await db.prepare("INSERT INTO sheets(user, tool, rows, updated_at) VALUES(?1,?2,?3,?4) ON CONFLICT(user, tool) DO UPDATE SET rows=excluded.rows, updated_at=excluded.updated_at")
         .bind(user, sm[1], JSON.stringify(rows), t).run();
       return json({ ok: true, updated_at: t, n: rows.length });
@@ -146,7 +183,7 @@ export async function onRequest({ request, env }) {
 
     if (request.method === "POST") {
       const b = await request.json().catch(() => null);
-      if (b === null) return json({ error: "bad json" }, 400);
+      if (!b || typeof b !== "object" || Array.isArray(b)) return json({ error: "body must be a JSON object" }, 400);
       if (path === "/api/posts") return json(await upsert(db, b));
       if (path === "/api/bulk_approve" || path === "/api/bulk") {
         const action = path === "/api/bulk_approve" ? "approve" : b.action;

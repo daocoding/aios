@@ -1,6 +1,6 @@
 // aiOS Sheets engine: formulas, CSV, and a dependency-free XLSX reader/writer. MIT.
 (function (G) {
-  const S = {};
+  const S = { currency: "$" };
   // ---------- formulas (Excel syntax with {key} placeholders) ----------
   const FN = {
     IF: (c, a, b) => (c ? a : b), AND: (...a) => a.every(Boolean), OR: (...a) => a.some(Boolean),
@@ -45,7 +45,7 @@
     if (typeof v === "string" && !numeric(t)) return v;
     const n = +v; if (isNaN(n)) return String(v);
     if (t === "pct") return (n * 100).toFixed(1) + "%";
-    if (t === "money") return "$" + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    if (t === "money") return (n < 0 ? "-" : "") + S.currency + Math.abs(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     if (t === "num2") return n.toFixed(2);
     if (t === "int") return Math.round(n).toLocaleString();
     return typeof v === "number" ? n.toLocaleString(undefined, { maximumFractionDigits: 2 }) : String(v);
@@ -58,8 +58,15 @@
   // ---------- CSV ----------
   S.toCSV = (tool, rows) => {
     const q = v => { v = v == null ? "" : String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
-    return [tool.columns.map(c => q(c.label)).join(",")].concat(rows.map(r => tool.columns.map(c => q(r[c.key])).join(","))).join("\n");
+    return [tool.columns.map(c => q(c.label)).join(",")].concat(rows.map(r => tool.columns.map(c => q(S.csvVal(r[c.key], c.type === "formula" ? (c.fmt || "text") : c.type))).join(","))).join("\n");
   };
+  // Round numbers for export by column type (pct stays a fraction, e.g. 0.2599).
+  S.csvVal = (v, t) => {
+    if (typeof v !== "number" || !isFinite(v)) return v;
+    const d = t === "int" ? 0 : t === "pct" ? 4 : (t === "money" || t === "num2") ? 2 : 4;
+    return +v.toFixed(d);
+  };
+  S.tabName = tool => (tool.tab || tool.title.replace(/\s*\(.*?\)\s*/g, " ").trim()).slice(0, 31).replace(/[\\\/?*\[\]:]/g, "-");
   S.parseCSV = text => {
     const rows = []; let row = [], cell = "", q = false;
     for (let i = 0; i < text.length; i++) { const ch = text[i];
@@ -70,9 +77,11 @@
     if (cell !== "" || row.length) { row.push(cell); rows.push(row); }
     return rows.filter(r => r.some(c => c !== ""));
   };
-  S.matrixToRows = (tool, m) => { // header row matched by label or key
-    const hdr = m[0].map(h => String(h).trim().toLowerCase());
-    const idx = tool.columns.map(c => hdr.findIndex(h => h === c.label.toLowerCase() || h === c.key.toLowerCase()));
+  S.matrixToRows = (tool, m, lab) => { // header row matched by label (any offer-type variant, with or without " ƒ") or key
+    if (!m || !m.length) return [];
+    const hdr = m[0].map(h => String(h).replace(/\s*ƒ$/, "").trim().toLowerCase());
+    const names = c => [c.key, c.label, ...(c.alt ? Object.values(c.alt) : []), lab ? lab(c) : c.label].map(x => String(x).toLowerCase());
+    const idx = tool.columns.map(c => hdr.findIndex(h => names(c).includes(h)));
     return m.slice(1).map(r => { const o = {}; tool.columns.forEach((c, i) => { if (c.type !== "formula" && idx[i] >= 0) o[c.key] = S.parseInput(r[idx[i]] ?? "", c.type); }); return o; });
   };
   // ---------- XLSX (stored zip writer + deflate-raw reader) ----------
@@ -103,7 +112,7 @@
         ? `<c r="${colL(i)}${n}"${typeof cr[c.key] === "string" ? ' t="str"' : ""}><f>${esc(S.xlFormula(tool, c.f, n))}</f><v>${esc(cr[c.key])}</v></c>`
         : cell(colL(i) + n, r[c.key])).join("") + "</row>"; });
     const ws = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>${x}</sheetData></worksheet>`;
-    const name = esc(tool.title.slice(0, 31).replace(/[\\\/?*\[\]:]/g, "-"));
+    const name = esc(S.tabName(tool));
     return zip([
       ["[Content_Types].xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>`],
       ["_rels/.rels", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`],
@@ -123,21 +132,37 @@
     }
     return files;
   }
-  S.readXLSX = async buf => {
+  // All worksheets: [{name, m}] in workbook order (m = matrix of cell strings).
+  S.readXLSXSheets = async buf => {
     const f = await unzip(buf), dec = new TextDecoder(), P = s => new DOMParser().parseFromString(dec.decode(s), "application/xml");
     const ss = f["xl/sharedStrings.xml"] ? [...P(f["xl/sharedStrings.xml"]).getElementsByTagName("si")].map(si => [...si.getElementsByTagName("t")].map(t => t.textContent).join("")) : [];
-    const sheet = Object.keys(f).filter(k => /^xl\/worksheets\/sheet\d+\.xml$/.test(k)).sort()[0];
-    const m = [];
-    for (const row of P(f[sheet]).getElementsByTagName("row")) {
-      const r = [];
-      for (const c of row.getElementsByTagName("c")) {
-        const ref = c.getAttribute("r").replace(/\d+/g, ""); let ci = 0; for (const ch of ref) ci = ci * 26 + ch.charCodeAt(0) - 64; ci--;
-        const t = c.getAttribute("t"), v = c.getElementsByTagName("v")[0]?.textContent ?? "";
-        r[ci] = t === "s" ? ss[+v] : t === "inlineStr" ? [...c.getElementsByTagName("t")].map(x => x.textContent).join("") : v;
-      }
-      m.push(Array.from(r, x => x ?? ""));
+    const rels = {};
+    if (f["xl/_rels/workbook.xml.rels"]) for (const r of P(f["xl/_rels/workbook.xml.rels"]).getElementsByTagName("Relationship")) rels[r.getAttribute("Id")] = "xl/" + r.getAttribute("Target").replace(/^\/?xl\//, "").replace(/^\//, "");
+    let order = [];
+    if (f["xl/workbook.xml"]) for (const sh of P(f["xl/workbook.xml"]).getElementsByTagName("sheet")) {
+      const rid = sh.getAttribute("r:id") || sh.getAttributeNS("http://schemas.openxmlformats.org/officeDocument/2006/relationships", "id");
+      if (rels[rid] && f[rels[rid]]) order.push({ name: sh.getAttribute("name"), path: rels[rid] });
     }
-    return m;
+    if (!order.length) order = Object.keys(f).filter(k => /^xl\/worksheets\/sheet\d+\.xml$/.test(k)).sort().map((p, i) => ({ name: "Sheet" + (i + 1), path: p }));
+    return order.map(({ name, path }) => {
+      const m = [];
+      for (const row of P(f[path]).getElementsByTagName("row")) {
+        const r = [];
+        for (const c of row.getElementsByTagName("c")) {
+          const ref = c.getAttribute("r").replace(/\d+/g, ""); let ci = 0; for (const ch of ref) ci = ci * 26 + ch.charCodeAt(0) - 64; ci--;
+          const t = c.getAttribute("t"), v = c.getElementsByTagName("v")[0]?.textContent ?? "";
+          r[ci] = t === "s" ? ss[+v] : t === "inlineStr" ? [...c.getElementsByTagName("t")].map(x => x.textContent).join("") : v;
+        }
+        m.push(Array.from(r, x => x ?? ""));
+      }
+      return { name, m };
+    });
   };
+  // Pick the worksheet that belongs to this tool (by tab name, title or id), else the first one.
+  S.pickSheet = (tool, sheets) => {
+    const want = [S.tabName(tool), tool.title.slice(0, 31), tool.id].map(x => x.toLowerCase());
+    return sheets.find(s => want.includes(String(s.name).toLowerCase())) || sheets[0];
+  };
+  S.readXLSX = async (buf, tool) => { const sh = await S.readXLSXSheets(buf); return (tool ? S.pickSheet(tool, sh) : sh[0]).m; };
   G.AIOS_SHEETS = S;
 })(typeof window !== "undefined" ? window : globalThis);

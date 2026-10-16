@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """aiOS Grok Edition - Content Review Queue. Zero-dependency (stdlib) server: http.server + sqlite3."""
-import hashlib, hmac, json, os, sqlite3, sys, threading
+import hashlib, hmac, json, os, sqlite3, sys, threading, time
+import sheets_engine
 from datetime import datetime, timezone
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from http.cookies import SimpleCookie
@@ -15,6 +16,11 @@ IMAGE_ROOTS = [r for r in os.environ.get("AIOS_IMAGE_ROOTS", ROOT).split(":") if
 STATUSES = ("draft", "approved", "changes_requested", "skipped", "posted")
 EDITABLE = ("account", "pillar", "scheduled_at", "text", "parts", "image_path", "status", "owner_comment", "operator_note", "posted_url")
 _lock = threading.Lock()
+TOOLS = sheets_engine.load_spec(os.path.join(ROOT, "static", "tools.json"))
+CURRENCIES = ("$", "€", "£", "¥", "₹", "R$", "A$", "C$", "CHF ", "kr ")
+OFFER_TYPES = ("physical", "digital", "service", "local")
+_fails = {}  # ip -> [timestamps of failed logins]
+MAX_FAILS, FAIL_WINDOW = 5, 600
 
 def now(): return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
@@ -52,6 +58,22 @@ def init_db():
         c.execute("""CREATE TABLE IF NOT EXISTS sheets(
           user TEXT NOT NULL, tool TEXT NOT NULL, rows TEXT NOT NULL DEFAULT '[]', updated_at TEXT,
           PRIMARY KEY(user, tool))""")
+        c.execute("CREATE TABLE IF NOT EXISTS settings(user TEXT PRIMARY KEY, data TEXT NOT NULL DEFAULT '{}')")
+
+def now_ms(): return datetime.now(timezone.utc).isoformat(timespec="milliseconds")
+
+def get_settings(c, user):
+    r = c.execute("SELECT data FROM settings WHERE user=?", (user,)).fetchone()
+    d = json.loads(r["data"]) if r else {}
+    return {"currency": d.get("currency", "$"), "offer_type": d.get("offer_type", "physical")}
+
+def sheet_payload(tool, rows, updated_at, computed=True):
+    out = {"tool": tool, "rows": rows, "updated_at": updated_at}
+    if computed:
+        t = TOOLS[tool]
+        out["computed"] = [sheets_engine.compute_row(t, r) for r in rows]
+        out["kpis"] = sheets_engine.kpis(t, rows)
+    return out
 
 def row(r):
     d = dict(r); d["parts"] = json.loads(d["parts"]) if d.get("parts") else None; return d
@@ -156,10 +178,14 @@ class H(BaseHTTPRequestHandler):
         if u.path == "/api/me": return self.send_json(200, {"user": user})
         if u.path == "/api/sheets":
             with db() as c:
-                return self.send_json(200, [dict(r) for r in c.execute("SELECT tool, updated_at, json_array_length(rows) AS n FROM sheets WHERE user=?", (user,))])
+                return self.send_json(200, [dict(r) for r in c.execute("SELECT tool, updated_at, json_array_length(rows) AS n FROM sheets WHERE user=? ORDER BY tool", (user,))])
+        if u.path == "/api/settings":
+            with db() as c: return self.send_json(200, get_settings(c, user))
         if u.path.startswith("/api/sheets/"):
-            with db() as c: r = c.execute("SELECT rows, updated_at FROM sheets WHERE user=? AND tool=?", (user, u.path.split("/")[3])).fetchone()
-            return self.send_json(200, {"rows": json.loads(r["rows"]) if r else [], "updated_at": r["updated_at"] if r else None})
+            tool = u.path.split("/")[3]
+            if tool not in TOOLS: return self.send_json(404, {"error": f"unknown tool '{tool}'", "tools": sorted(TOOLS)})
+            with db() as c: r = c.execute("SELECT rows, updated_at FROM sheets WHERE user=? AND tool=?", (user, tool)).fetchone()
+            return self.send_json(200, sheet_payload(tool, json.loads(r["rows"]) if r else [], r["updated_at"] if r else None, qs.get("raw", ["0"])[0] != "1"))
         if u.path == "/api/posts":
             return self.send_json(200, list_posts(qs.get("status", [None])[0], qs.get("due", ["0"])[0] == "1"))
         if u.path.startswith("/api/posts/"):
@@ -181,15 +207,38 @@ class H(BaseHTTPRequestHandler):
         u = urlparse(self.path)
         user = self.authed()
         if not user: return self.send_json(401, {"error": "unauthorized"})
-        if not u.path.startswith("/api/sheets/"): return self.send_json(404, {"error": "not found"})
-        tool = u.path.split("/")[3]
         try: b = self.body()
         except Exception: return self.send_json(400, {"error": "bad json"})
-        rows = b.get("rows")
+        if u.path == "/api/settings":
+            if not isinstance(b, dict): return self.send_json(400, {"error": "body must be an object"})
+            with _lock, db() as c:
+                cur = get_settings(c, user)
+                if "currency" in b:
+                    if b["currency"] not in CURRENCIES: return self.send_json(400, {"error": "currency must be one of " + ", ".join(CURRENCIES)})
+                    cur["currency"] = b["currency"]
+                if "offer_type" in b:
+                    if b["offer_type"] not in OFFER_TYPES: return self.send_json(400, {"error": "offer_type must be one of " + ", ".join(OFFER_TYPES)})
+                    cur["offer_type"] = b["offer_type"]
+                c.execute("INSERT INTO settings(user, data) VALUES(?,?) ON CONFLICT(user) DO UPDATE SET data=excluded.data", (user, json.dumps(cur)))
+            return self.send_json(200, cur)
+        if not u.path.startswith("/api/sheets/"): return self.send_json(404, {"error": "not found"})
+        tool = u.path.split("/")[3]
+        if tool not in TOOLS: return self.send_json(404, {"error": f"unknown tool '{tool}'", "tools": sorted(TOOLS)})
+        # Accept a bare JSON array of row objects, or {"rows": [...], "base_updated_at": "..."}.
+        base = self.headers.get("If-Match")
+        if isinstance(b, list): rows = b
+        elif isinstance(b, dict):
+            rows = b.get("rows"); base = b.get("base_updated_at", base)
+        else: rows = None
         if not isinstance(rows, list) or len(rows) > 5000 or not all(isinstance(r, dict) for r in rows):
-            return self.send_json(400, {"error": "rows must be a list of objects (max 5000)"})
-        t = now()
+            return self.send_json(400, {"error": "body must be a JSON array of row objects, or {\"rows\": [...]} (max 5000 rows)"})
+        keys = {c["key"] for c in TOOLS[tool]["columns"] if c["type"] != "formula"}
+        rows = [{k: v for k, v in r.items() if k in keys} for r in rows]  # drop computed/unknown keys
         with _lock, db() as c:
+            cur = c.execute("SELECT updated_at FROM sheets WHERE user=? AND tool=?", (user, tool)).fetchone()
+            if base and (cur["updated_at"] if cur else "") != base.strip('"'):
+                return self.send_json(409, {"error": "conflict: sheet changed since base_updated_at; reload and retry", "updated_at": cur["updated_at"] if cur else None})
+            t = now_ms()
             c.execute("INSERT INTO sheets(user, tool, rows, updated_at) VALUES(?,?,?,?) ON CONFLICT(user, tool) DO UPDATE SET rows=excluded.rows, updated_at=excluded.updated_at",
                       (user, tool, json.dumps(rows, ensure_ascii=False), t))
         return self.send_json(200, {"ok": True, "updated_at": t, "n": len(rows)})
@@ -198,11 +247,20 @@ class H(BaseHTTPRequestHandler):
         u = urlparse(self.path)
         try: b = self.body()
         except Exception: return self.send_json(400, {"error": "bad json"})
+        if not isinstance(b, dict): return self.send_json(400, {"error": "body must be a JSON object"})
         if u.path == "/api/login":
+            ip = self.client_address[0]; t0 = time.time()
+            with _lock:
+                recent = [x for x in _fails.get(ip, []) if t0 - x < FAIL_WINDOW]; _fails[ip] = recent
+            if len(recent) >= MAX_FAILS:
+                return self.send_json(429, {"error": "too many failed attempts; try again later"}, [("Retry-After", str(int(FAIL_WINDOW - (t0 - recent[0])) + 1))])
             given = str(b.get("token", "")).strip()
             for tok in load_users():
                 if hmac.compare_digest(given, tok):
+                    with _lock: _fails.pop(ip, None)
                     return self.send_json(200, {"ok": True}, [("Set-Cookie", f"aios_session={session_value(tok)}; HttpOnly; SameSite=Strict; Path=/; Max-Age=2592000")])
+            with _lock: _fails.setdefault(ip, []).append(t0)
+            time.sleep(1)  # slow down guessing
             return self.send_json(401, {"error": "wrong passcode"})
         if u.path == "/api/logout":
             return self.send_json(200, {"ok": True}, [("Set-Cookie", "aios_session=; Path=/; Max-Age=0")])

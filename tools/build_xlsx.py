@@ -14,6 +14,11 @@ FMT = {"pct": "0.0%", "money": '"$"#,##0.00', "num2": "0.00", "int": "#,##0", "n
 HEAD = PatternFill("solid", fgColor="111316"); FHEAD = PatternFill("solid", fgColor="0F766E"); FCELL = PatternFill("solid", fgColor="F2FAF8")
 ROWS = 200
 
+def tab_name(t):
+    """Same rule as sheets.js S.tabName: explicit 'tab', else title without parentheticals; max 31 chars."""
+    n = t.get("tab") or re.sub(r"\s*\(.*?\)\s*", " ", t["title"]).strip()
+    return re.sub(r"[\\/?*\[\]:]", "-", n)[:31]
+
 def fill(ws, t):
     cols = t["columns"]; idx = {c["key"]: i for i, c in enumerate(cols)}
     ws.append([c["label"] + (" ƒ" if c["type"] == "formula" else "") for c in cols])
@@ -59,8 +64,8 @@ def about(ws, t):
 out = os.path.join(ROOT, "templates", "xlsx"); os.makedirs(out, exist_ok=True)
 book = Workbook(); book.remove(book.active)
 for t in spec["tools"]:
-    wb = Workbook(); ws = wb.active; ws.title = "Sheet"; fill(ws, t); about(wb.create_sheet("About"), t)
+    wb = Workbook(); ws = wb.active; ws.title = tab_name(t); fill(ws, t); about(wb.create_sheet("About"), t)
     wb.save(os.path.join(out, t["id"] + ".xlsx"))
-    fill(book.create_sheet(t["title"][:31].replace("/", "-").replace(":", "")), t)
+    fill(book.create_sheet(tab_name(t)), t)
 book.save(os.path.join(ROOT, "templates", "aios-operating-sheets.xlsx"))
 print("built", len(spec["tools"]), "templates")
