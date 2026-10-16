@@ -3,7 +3,7 @@
 **An open, agent-runnable operating system for businesses that grow through the creator economy.**
 Your agents do the research, drafting, and analysis. You make the decisions. Every decision gets tested before it gets scaled.
 
-🌐 Home and hosted version: **https://aios.pages.dev** · 🧠 Methodology: [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md) · 🤖 Agent setup: [`AGENT_SETUP.md`](AGENT_SETUP.md)
+🌐 Hosted version: URL TBD (set once in [`site/aios.config.json`](site/aios.config.json)) · 🧠 Methodology: [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md) · 🤖 Agent setup: [`AGENT_SETUP.md`](AGENT_SETUP.md)
 
 ---
 
@@ -30,19 +30,32 @@ Any business that sells through creators, influencers, and short-form content: c
 | [`templates/xlsx/`](templates/xlsx/) · [`templates/aios-operating-sheets.xlsx`](templates/aios-operating-sheets.xlsx) | The same 15 sheets as Excel workbooks (formulas, dropdowns, sample rows); rebuild with `tools/build_xlsx.py` |
 | [`apps/content-review/`](apps/content-review/) | The human approval gate: full-width rows, select all, bulk approve. Python stdlib + SQLite, no dependencies |
 | [`cloudflare/`](cloudflare/) | The same approval app for Cloudflare Pages + Functions + D1, so it runs on *your* account |
-| [`site/`](site/) | The aios.pages.dev landing site (static) |
+| [`site/`](site/) | The landing site (static); its hosted URL is TBD and configured in `site/aios.config.json` |
 
 ### The modules
 `00` Operating principles · `01` Opportunity & offer fit · `02` Creator partnerships · `03` Content engine · `04` Paid amplification · `05` Measure & learn · `06` Operating cadence · `07` AI-native team · `08` Channel flywheel
+
+## Get the code
+Until PR #1 is merged, the code lives on the `aios-grok-edition` branch (`main` has only a README):
+```bash
+git clone -b aios-grok-edition https://github.com/daocoding/aios.git
+```
 
 ## Quick start (human)
 1. Read [`modules/00-operating-principles.md`](modules/00-operating-principles.md). It takes five minutes.
 2. Give your agent this repo and say: *"Set up aiOS for my business by following AGENT_SETUP.md."*
 3. Answer its intake questions (offer, audience, channels, budget caps).
-4. Each day, open your Content Review page and approve, edit, or send back what your agents drafted. Keep the numbers in **Operating Sheets** (link in the header).
+4. In **Operating Sheets**, follow the *Start here: 30-day path* in the sidebar (day 1: Owner Self-Check + Unit Economics; days 1–3: Offer Scorecard + Launch Plan; week 1: Selling Points + Creator Pipeline; weeks 2–4: Asset Log + Ad Diagnosis; weekly: Hypothesis Ledger + Weekly Review). You don't need all 15 sheets on day one.
+5. Each day, open your Content Review page and approve, edit, or send back what your agents drafted. Keep the numbers in **Operating Sheets** (link in the header).
 
 ## Quick start (agent)
 Read [`AGENT_SETUP.md`](AGENT_SETUP.md). It's written for you.
+
+## Tests
+```bash
+python3 -m unittest discover -s tests          # Python app + formula engine (stdlib only; parity check needs node)
+cd tests && npm install && npm test             # Cloudflare function against an in-memory D1 shim
+```
 
 ## Principles we won't compromise
 - **Humans decide, and agents execute.** Nothing is published, sent, or paid for without owner approval.
@@ -50,6 +63,6 @@ Read [`AGENT_SETUP.md`](AGENT_SETUP.md). It's written for you.
 - **Honest marketing.** Disclose sponsorships and AI-generated content. Use real people's likeness only with consent.
 
 ## About
-aiOS Grok Edition is built in the open by **G8** (Group of 8), a small team in the US that builds products and people. The methodology is our own synthesis of practitioner lessons from creator-commerce operators, generalized beyond any single platform or market.
+aiOS Grok Edition is built in the open by a small US team that builds products and people. The methodology is our own synthesis of practitioner lessons from creator-commerce operators, generalized beyond any single platform or market.
 
 MIT licensed. Contributions welcome. See [`CONTRIBUTING.md`](CONTRIBUTING.md).

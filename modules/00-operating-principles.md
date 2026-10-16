@@ -11,7 +11,7 @@
 3. **Every new audience, region, or channel is a fresh hypothesis.** Respect the context gap, and remember that past wins can become baggage.
 4. **Three signals before a big bet.** A single data point is noise. Data with no causal chain is just intuition dressed up as data.
 5. **Calm decisions.** Make no directional decision at an emotional peak or low. Decide at the next session, with a checklist.
-6. **Seek truth from facts, and free your thinking.** Report the data honestly, and don't let the old playbook bind the new business.
+6. **Report what happened, and unlearn the old playbook.** State the data honestly, and treat past experience as input, not as rules for the new business.
 7. **No SOP, no agent.** If you can't write the procedure down, an agent can't run it.
 8. **Humans decide, AI executes.** Humans set the standards and AI runs the process. Humans innovate and AI keeps the learning.
 9. **Honesty with the audience.** Disclose sponsorships, and disclose any AI-generated or synthetic likeness. Use real people's likeness only with explicit consent, and follow platform rules and local law.

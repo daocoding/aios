@@ -46,3 +46,4 @@ that must not be paused. Never change live campaigns yourself; output recommenda
 - On a spike, identify its source (product, creative, price, creator, event) and replicate that same day.
 - 10→100: profit model first; run sales events as warm-up → peak → encore.
 - **Operating Sheet:** `ad-diagnosis` (KPIs: blended ROAS, conversions toward 50).
+- The `ad-diagnosis` sheet is stage-aware: in 0→1, a creative below break-even with fewer than ~50 conversions reads **"Learning - hold until ~50 conversions"**, not P0.

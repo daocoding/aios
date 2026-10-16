@@ -5,3 +5,4 @@ owner_token
 .wrangler/
 node_modules/
 .dev.vars
+.deploy/

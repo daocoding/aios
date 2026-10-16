@@ -40,14 +40,14 @@ R-type decisions *look* decisive but are actually reactive: the operator is push
 The single deepest source of failure when entering a new market or audience is **context mismatch**: assuming what works for you or your home audience works for them. A feature that is a top selling point in one context can be useless in another (a classic case: a one-hand-open bottle whose finger loop was too small for the target users' hands, and whose "keeps drinks hot" promise mattered less than "keeps drinks ice-cold"). Every new audience, region, or platform is a **new hypothesis**, never a copy-paste of the old playbook.
 
 ### 1.4 Past success is baggage in a new arena
-What made you win in one channel (e.g., search-driven marketplace selling) can be the biggest obstacle in a new one (interest-driven, content-led commerce). New continents need new maps; verify locally.
+What made you win in one channel (e.g., search-driven marketplace selling) can be the biggest obstacle in a new one (interest-driven, content-led commerce). A new arena needs its own groundwork; check how buying works there before applying old habits.
 
 ### 1.5 Fix one variable to learn about another
-When two big unknowns stack (new team + new product, new market + new offer), you cannot tell which one failed. Pin one variable as a constant, test the other. "The danger is not trial and error; it's spending money without knowing what was wrong."
+When two big unknowns stack (new team + new product, new market + new offer), you cannot tell which one failed. Pin one variable as a constant, test the other. Experiments are cheap; spending without being able to say what went wrong is what costs you.
 
 ### 1.6 Two working rules
-- **Seek truth from facts:** report what the data says, not what protects our ego or earlier decisions.
-- **Free the thinking:** do not let old experience dictate a new business model.
+- **Report what happened:** state what the data shows, not what protects our ego or earlier decisions.
+- **Unlearn the old playbook:** past experience is an input, not the rulebook for a new business model.
 
 ### 1.7 Humans decide, AI executes
 - Humans **decide**; AI **executes**.
@@ -65,7 +65,7 @@ AI does not replace the owner; it amplifies the owner's judgment. But: **no SOP,
 | 2 | **Experience worship** | Importing another team's endpoint as your starting point; staffing every role on day one. | Diagnose the market's stage first; the play determines the org chart. |
 | 3 | **Emotional decisions** | Big calls made at the peak of a heated meeting. | No directional decision during an emotional high or low. Sleep on it; decide next meeting with a checklist. Don't decide before the real problem is defined. |
 | 4 | **False analogy** | "It worked there, so it will work here." | Every new market/channel is a separate hypothesis. Verify the local consumption model first. |
-| 5 | **Single-point decisions** | One good data point → stock up / raise price / go all-in. | Require **≥3 independent signals** before a large commitment. Data without a causal chain is intuition in a lab coat. |
+| 5 | **Single-point decisions** | One good data point → stock up / raise price / go all-in. | Require **≥3 independent signals** before a large commitment. Numbers without a cause-and-effect story are still just a hunch. |
 | 6 | **No validation** | Shipping the full batch, then discovering a basic mismatch (wrong plug standard, wrong size). | Common sense → research → small batch → full rollout. Mistakes are allowed; mistakes of *common knowledge* are not. |
 
 Four questions a V-type operator asks before any decision:
@@ -143,13 +143,19 @@ Work backwards from price: subtract product cost, logistics, platform commission
 - Read three signals: (1) do people click/engage, (2) how do creators react after trying it, (3) does it **convert** — customers voting with money.
 - Only after the content tests pass do you commit large inventory.
 - Practical shape of the first batch: roughly **50–80 units shipped by the fastest route** (air), so inventory risk and calendar time both stay small.
-- **Creative before cargo:** while the batch is in transit, prepare five creative directions so testing starts the day stock lands: *pain scene*, *before/after*, *usage demo*, *price anchor*, *creator talk-to-camera*. Line up creators in the same window.
+- **Creative before cargo:** while the batch is in transit, have several creative angles ready so testing starts the day stock lands — e.g. show the problem in its real setting, a side-by-side result, the product in use, a value comparison against what people pay today, and a creator speaking in their own voice. Line up creators in the same window.
 - The three MVT metrics, in funnel order: **product-card click-through**, **creator response and content output**, **conversion**.
 
 ### 4.7 The selection workflow (0→1)
 1. Pick the market/site that matches your capability (see 4.1). 2. Pick the core category. 3. Choose data sources (platform bestseller lists, marketplace movers, review mining). 4. Write the pool criteria (three-axis test). 5. Study competitor shops and back-solve their cost from their price, so you know how much "ammunition" each side has. 6. Cost it out with the full stack (unit cost, first/last-mile logistics, warehousing, commission, ads, creator commission, returns). 7. Record every candidate in a **selection log** — the log, not memory, is what gets reviewed. *(aiOS: Offer Scorecard + Unit Economics sheets.)*
 
 Prove the loop before you build a product: selling an existing (even third-party) product first is a cheap way to learn the channel, the audience, and the content before committing to your own SKU.
+
+**Copy only recent winners.** If you model a proven product or video, take one that broke out in the last one to two months; year-old winners are usually saturated by the time you arrive.
+
+**Count the cash in motion.** For physical goods, money is locked in several batches at once (stock on hand, stock in transit, the next batch in production). Size the first batches to the cash you can afford to have frozen, not to the forecast. *(Offer Scorecard: cash exposure check.)*
+
+**Non-physical offers.** For apps, courses, services and local businesses, read "unit cost + logistics" as *delivery cost per sale* (hosting, licences, staff time, booking fees), "samples" as *free access, a trial session or a comp visit*, and the "small batch" as a *small paid pilot* (a limited cohort, a few booked clients, a soft-launch weekend). The decision rules are the same. In the app, set **Offer type** and **Currency** in the header; the sheets relabel themselves.
 
 ### 4.8 AI's role here
 A human analyst can evaluate 3–4 opportunities at a time; an agent can screen hundreds. Agents produce a market-insight brief from a product photo + goal: who buys, why, competing bestsellers, comparison table, creator and content suggestions, and risk flags (seasonality ending, compliance gaps). Winners are **selected, not pushed**: a product's ceiling is largely decided at the moment you choose it.
@@ -173,7 +179,7 @@ Write one brief per **audience segment** (parents, fitness, beauty, general…);
 
 **Relationship ladder:** text DM → voice → a one-minute call (emotion and warmth convert) → product trial → *then* commercial terms. Treat top creators as **distribution partners and friends**, not vendors: thoughtful, personal gestures outperform bigger commissions in mature markets. Every long-term creator relationship is a new distributor for every future launch.
 
-**Hiring insight:** communication skill beats platform knowledge. Platform tools can be taught in half a day from an SOP; rapport cannot.
+**Hiring insight:** communication skill beats platform knowledge. Platform tools can be taught in half a day from an SOP; rapport cannot. People who have done relationship-heavy selling in other industries often outperform platform specialists. Where in-person contact matters, a local part-timer (student or contractor) who can meet key creators face to face is a cheap, high-trust channel.
 
 **Metrics (owner watches outcomes, not activity):**
 - Reply rate to outreach; % moved into your own contact channel
@@ -203,13 +209,15 @@ Rules: all beats are required; the **order cannot be shuffled**; **one selling p
 
 **Seed vs. harvest:** interest-driven platforms have no search shelf. **Seeding** videos (no hard sell) build an aware audience; **harvesting** videos (offer-led) convert them later. Without seeding there is nothing to harvest — plan seeding weeks before any sales event.
 
+**Not everything is a formula.** A small share of breakout videos ride on personality, a meme, or timing; don't spend weeks reverse-engineering those. Study the repeatable majority. And train the people who actually shoot and edit — an owner who learns the framework alone can't transfer it.
+
 **Assetize:** maintain a **hook library** (decompose every winning video into hook / proof / scene / CTA and save keyframes), then combine components (Hook A + Proof 2 + CTA 3…). Maintain a library of **script frameworks** (e.g., context-clash, gifting/occasion, review/test, visual wow, pain-agitate-solve, comparison, creator-recommendation). That library is the company's real asset; individual talent becomes company capability.
 
 **Selling-point sprint:** list *all* possible selling points, graded S/A/B/C; validate two per week through creators and own videos; aggregate the data; then go all-in on the proven one. Your feeling about which point is best does not matter.
 
 **Five-meeting content workflow:** (1) launch analysis, (2) selling-point enumeration, (3) content positioning (agree the framework), (4) production (log *every* asset, good or bad), (5) retrospective. Daily 1-minute stand-up per creator/editor: yesterday's data, anomalies, why it worked, today's plan.
 
-**Replicate winners "until you're sick of it."** If a script still converts, keep remaking it; you have not hit the ceiling.
+**Keep remaking winners well past the point of boredom.** If a script still converts, it hasn't peaked; your fatigue is not the audience's.
 
 **AI in content:** agents generate dozens of angles in seconds; decompose winning videos (hook, product frequency, cut rhythm, realism); expand one winner into five testable variants (pain, review, comparison, scene, creator-recommendation). Prompt quality is professional skill: specify setting, style, lighting, layout, emotion — detail in, quality out. Learn the craft before automating it, or the automation step collapses. *(Ethics note for aiOS: any synthetic or AI-generated likeness must be clearly disclosed and used only with explicit consent and per platform rules.)*
 
@@ -237,7 +245,7 @@ Ads are the biggest lever on a proven asset, and the highest-leverage role per p
 - **Maturity ladder:** L1 automate frontline tasks → L2 managers orchestrate agents across a function → L3 cross-functional agent workflows → L4 the CEO orchestrates the whole operation through role agents. The leader's conviction determines how far it goes.
 - **Stage the adoption:** in 0→1, automate only what creates positive feedback (e.g., batch content production); in 1→10, expand role by role; in 10→100, scale across markets/categories. A "perfect AI org" pasted onto a real company just exposes holes.
 - **Agent hub architecture:** management layer + function centers (content, creators, live, paid, ops) talk to a central agent hub that reaches into product, supply, fulfillment, support, ad analytics, and finance. The CEO can ask a role agent in a group chat ("how's the business this week?") and get an answer in a minute.
-- **Org path by stage:** 0→1 runs on founder judgment (close the smallest loop yourself); 1→10 runs on module coordination (replicable playbooks); 10→100 runs on the organizational system. AI's share: market insight, selection analysis, creator outreach, video breakdown, ad diagnosis, data review. The leader's share: define problems, set standards, design processes, judge results, train the system.
+- **Org path by stage:** 0→1 runs on founder judgment (close the smallest loop yourself); 1→10 runs on module coordination (replicable playbooks); 10→100 runs on the organizational system. Agents take the repeatable analysis and outreach work (market scans, offer screening, creator shortlists and first messages, breaking down winning videos, ad triage, weekly numbers). The leader keeps what can't be delegated: choosing which problem matters, deciding what "good" looks like, shaping the workflow, signing off on outcomes, and teaching the agents through feedback.
 - **Orchestrator pattern:** a lead agent receives a goal, decomposes it, dispatches to specialist agents (vision analysis, scripts, outreach, ads), and returns one consolidated plan for human approval.
 - Productivity benchmark idea: measure **revenue per person** and expect AI to lift it materially; hire for the size of business a person (plus agents) can drive.
 
@@ -246,7 +254,7 @@ Creator platforms **ignite** demand (cheapest attention today); marketplaces **c
 
 Four links, one flywheel: **creator platforms = engine** (seeding and spread), **marketplaces = base** (trust, search conversion, repeat), **owned store / community = profit pool** (retention, direct relationship, higher margin, resilience across platform cycles), **brand = moat** (mindshare and pricing power). Operators watch one channel's GMV; owners watch total business lift.
 
-Dividends (platform windows) let you win once; a scientific model lets you keep winning in the competitive phase; AI makes the model durable and raises the owner's decision quality.
+Act while the window is open: an early platform window rewards speed more than polish, so move now and use agents and SOPs to lock in what you learn before the window narrows. Dividends (platform windows) let you win once; a scientific model lets you keep winning in the competitive phase; AI makes the model durable and raises the owner's decision quality.
 
 ---
 

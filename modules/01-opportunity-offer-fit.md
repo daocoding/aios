@@ -49,8 +49,12 @@ Be explicit about uncertainty. Never recommend bulk commitment on fewer than 3 i
 ```
 
 ## Field notes (v2)
-- First batch: ~50–80 units by air; prepare five creative directions (pain scene, before/after, demo, price anchor, creator talk) while stock is in transit.
+- First batch: ~50–80 units by air; have several creative angles ready before stock lands (problem in context, side-by-side result, product in use, value comparison, creator in their own voice).
 - MVT metrics in funnel order: product-card CTR → creator response/output → conversion.
 - Back-solve competitors' cost from their price; record every candidate in a selection log.
 - Selling an existing product first is a cheap way to prove the channel loop before building your own SKU.
 - **Operating Sheets:** `market-stage`, `offer-scorecard`, `unit-economics`, `test-sprint`, `launch-plan` (in-app at `/tools`, or `templates/xlsx/`).
+- **Prove the loop with an existing product first.** Before committing to your own SKU, run the account selling a proven product from another brand (affiliate or partner). It teaches you the audience, hooks and creator types at almost no inventory risk. (Test Sprint row "0".)
+- Copy only winners from the last 1–2 months; older ones are saturated (Offer Scorecard: recency check).
+- Count cash locked across batches in motion (stock, in transit, in production) against a cap (Offer Scorecard: cash exposure).
+- Non-physical offers: switch **Offer type** in the Operating Sheets header; cost, logistics and sample columns relabel to delivery cost, onboarding and free trials.

@@ -44,3 +44,5 @@ Treat creators as long-term partners. Never send anything without owner approval
 - Communication ladder (strongest first): in person/gifts → group channel → call → voice → text.
 - Owner metrics: reply rate, creator retention, video return rate (≈90%), re-booking/conversion rate (≈half of active creators), sales.
 - **Operating Sheet:** `creator-pipeline` (KPIs: reply rate, content return rate, revenue per sample).
+- Hire for communication, not platform know-how; a local part-timer who can meet key creators in person is a cheap, high-trust channel.
+- Two ladders, don't merge them: the **market** matures (creator-led → content+paid → live+brand → owned audience) while your **creator program** matures (cold start → growth → competitive → relationship assets). Market Stage sheet tracks both.

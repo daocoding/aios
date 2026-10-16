@@ -10,7 +10,7 @@
 ## Procedure
 1. When any module proposes an action, **open a ledger row first**.
 2. Allow **one variable per test**. If two unknowns are stacked, split the test or pin one of them.
-3. At the end of the test, record the result **as observed** (seek truth from facts), list the independent signals, and propose a decision.
+3. At the end of the test, record the result **as observed** (report what happened, not what you hoped), list the independent signals, and propose a decision.
 4. Run the **weekly review**: what we believed, what we tested, what happened, what we learned, and what changes in the SOP or agent prompts.
 5. Run the **30-day sprint retrospective**: does the offer work, which selling point, which story, which audience? Decide whether to scale, iterate, or stop.
 6. **Fold learning back:** update the role manuals (module 07) and the agent prompt specs. That's how knowledge stops living in one person's head.
