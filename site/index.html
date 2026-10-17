@@ -55,7 +55,7 @@ footer .wrap{display:flex;gap:20px;flex-wrap:wrap;align-items:center}
 <body>
 <nav><div class="wrap">
   <a class="brand" href="#"><div class="logo" id="logo"></div>aiOS <span style="font-weight:500;color:var(--mute)">Grok Edition</span></a>
-  <div class="links"><a class="hide" href="#method">Method</a><a class="hide" href="#modules">Modules</a><a class="hide" href="#review">Approval</a><a href="#start">Get started</a><a href="https://github.com/daocoding/aios">GitHub</a></div>
+  <div class="links"><a class="hide" href="#method">Method</a><a class="hide" href="#modules">Modules</a><a class="hide" href="#review">Approval</a><a class="hosted-app" href="/tools" style="display:none">Open the app</a><a href="#start">Get started</a><a href="https://github.com/daocoding/aios">GitHub</a></div>
 </div></nav>
 
 <header class="hero"><div class="wrap">
@@ -134,7 +134,7 @@ footer .wrap{display:flex;gap:20px;flex-wrap:wrap;align-items:center}
   <p class="sub">Your agents put every post, video script, and creator message into a review queue. You see one compact, full-width row per item. Select all, bulk-approve, edit inline, or send something back with a comment. Your agent publishes only what you approved.</p>
   <div class="loop"><span>Agent drafts</span><i>→</i><span>Queue</span><i>→</i><span>You approve, edit, or send back</span><i>→</i><span>Agent publishes</span><i>→</i><span>Results logged</span><i>→</i><span>Hypothesis updated</span></div>
   <div class="grid g2" style="margin-top:28px">
-    <div class="card"><h3>Your account, your data</h3><p>Deploy the queue to your own Cloudflare account (Pages + Functions + D1, free tier friendly). A hosted version is planned (<span class="hosted">URL TBD</span>).</p></div>
+    <div class="card"><h3>Your account, your data</h3><p>Deploy the queue to your own Cloudflare account (Pages + Functions + D1, free tier friendly). Or use the hosted copy at <span class="hosted">URL TBD</span>: create a free workspace, and your sheets and queue stay private to you.</p></div>
     <div class="card"><h3>Zero-dependency option</h3><p>Prefer to run it locally? The Python version uses only the standard library and SQLite, so it runs on any laptop or small server.</p></div>
   </div>
 </div></section>
@@ -171,7 +171,7 @@ https://github.com/daocoding/aios/blob/main/AGENT_SETUP.md</pre>
 </div></footer>
 <script>
 const L=[1,1,1,1,0,2,1,1,1,1,0,1,1,1,1];
-fetch('aios.config.json').then(r=>r.ok?r.json():{}).then(c=>{if(c.hosted_url)document.querySelectorAll('.hosted').forEach(e=>e.innerHTML=`<a href="${encodeURI(c.hosted_url)}">${c.hosted_url.replace(/^https?:\/\//,'')}</a>`)}).catch(()=>{});
+fetch('aios.config.json').then(r=>r.ok?r.json():{}).then(c=>{if(c.hosted_url&&location.origin===c.hosted_url.replace(/\/+$/,''))document.querySelectorAll('.hosted-app').forEach(e=>e.style.display="");if(c.hosted_url)document.querySelectorAll('.hosted').forEach(e=>e.innerHTML=`<a href="${encodeURI(c.hosted_url)}">${c.hosted_url.replace(/^https?:\/\//,'')}</a>`)}).catch(()=>{});
 for(const id of ['logo','logo2'])document.getElementById(id).innerHTML=L.map(v=>`<i class="${v==0?'o':v==2?'g':''}"></i>`).join('');
 </script>
 </body>

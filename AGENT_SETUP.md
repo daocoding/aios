@@ -3,7 +3,7 @@
 You are an agent setting up **aiOS Grok Edition** for your owner (the human you work for). Follow these steps in order.
 Ask the owner only where this file says **ASK**. Don't skip the human gates.
 
-> The hosted version of aiOS is **URL TBD** (the single place to set it is `site/aios.config.json` → `hosted_url`). The recommended setup is to **self-host on the owner's own Cloudflare account**, so their queue and data live in their own account. Anything private (passcodes, API tokens) is created and stored only in the owner's account or secret store, never in this repo.
+> The hosted version of aiOS is **https://aios-grok.pages.dev** (open signup: anyone can create a private workspace; the single place to set the URL is `site/aios.config.json` → `hosted_url`). The recommended setup is to **self-host on the owner's own Cloudflare account**, so their queue and data live in their own account. Anything private (passcodes, API tokens) is created and stored only in the owner's account or secret store, never in this repo.
 
 ## 0. Ground rules
 - Read `modules/00-operating-principles.md` and `docs/METHODOLOGY.md` before anything else.
@@ -32,6 +32,7 @@ mkdir -p workspace/{opportunity,paid,reviews}
 ### Option A: owner's Cloudflare account (recommended)
 **Prereqs**
 - **Node 22+** (current wrangler 4 refuses older Node). On Node 18/20, use `npx wrangler@3` in every command below.
+- If wrangler fails with `EACCES: permission denied, mkdir '/node_modules/.cache/wrangler'` (a root-owned `/node_modules` on the machine), run `mkdir -p node_modules` in the directory you run wrangler from (`cloudflare/` and `cloudflare/.deploy/`; both are git-ignored).
 - A Cloudflare account. **ASK** the owner to sign up at https://dash.cloudflare.com/sign-up if needed.
 - Headless agents can't run `wrangler login` (it opens a browser). **ASK** the owner to create an API token (My Profile → API Tokens → Create Custom Token) with **Account · Cloudflare Pages: Edit**, **Account · D1: Edit**, **Account · Account Settings: Read** (lets wrangler resolve the account), and, if you'll host images, **Account · Workers R2 Storage: Edit**. Store it in your secret store and export it with the account ID (dashboard → any domain/Workers page → Account ID):
 ```bash
@@ -48,23 +49,26 @@ mkdir -p ~/.secrets && (umask 077; python3 -c 'import secrets;print(secrets.toke
 **2. Create D1 and a git-ignored deploy dir**
 ```bash
 cd cloudflare
-PROJECT=aios-review-<shortname>                # unique per owner; this becomes https://$PROJECT.pages.dev
-npx wrangler d1 create aios-review             # prints a database_id
+PROJECT=aios-review-<shortname>                # unique across Cloudflare; this becomes https://$PROJECT.pages.dev
+npx wrangler d1 create $PROJECT                # D1 is named after the project, so one account can host several copies; prints a database_id
 bash prepare-deploy.sh <database_id> $PROJECT  # runs sync.sh, writes cloudflare/.deploy/ with your id (git-ignored)
+#   add --with-site to put the landing page at / (queue at /review, sheets at /tools)
 cd .deploy
-npx wrangler d1 execute aios-review --remote --file=schema.sql
+npx wrangler d1 execute $PROJECT --remote --file=schema.sql
 ```
-Wrangler Pages does not accept a custom config path (`-c`), so the committed `wrangler.toml` keeps its placeholder and your real id lives only in `.deploy/`. Rerun `prepare-deploy.sh` after pulling changes or editing `apps/content-review/static/` (it calls `sync.sh`, which copies the UI into `public/` and regenerates `lib/spec.js`).
+Wrangler Pages does not accept a custom config path (`-c`), so the committed `wrangler.toml` keeps its placeholder and your real id lives only in `.deploy/`. Rerun `prepare-deploy.sh` after pulling changes or editing `apps/content-review/static/` (it calls `sync.sh`, which copies the UI into `public/` and regenerates `lib/spec.js`). It rebuilds `.deploy/` from scratch, so for two copies run it once per copy right before each deploy.
+**Upgrading a D1 created before workspaces/open signup** (posts table without a `ws` column): run `npx wrangler d1 execute $PROJECT --remote --file=migrations/001-workspaces-signup.sql` once.
 
 **3. Smoke-test locally before deploying** (inside `cloudflare/.deploy`)
 ```bash
-npx wrangler d1 execute aios-review --local --file=schema.sql
+npx wrangler d1 execute $PROJECT --local --file=schema.sql
 printf 'OWNER_TOKEN="%s"\n' "$(cat ~/.secrets/aios_owner_token)" > .dev.vars   # stays in the git-ignored dir
-npx wrangler pages dev public --port 8788 > /tmp/aios-dev.log 2>&1 &          # do NOT add --d1 (that creates a second, empty DB)
-sleep 10; curl -s localhost:8788/api/healthz                                   # {"ok":true}
+P=8788   # pick a free port (if something already listens there, curl hits that server instead)
+npx wrangler pages dev public --port $P > /tmp/aios-dev.log 2>&1 &          # do NOT add --d1 (that creates a second, empty DB)
+sleep 10; curl -s localhost:$P/api/healthz                                   # {"ok":true}
 PASS=$(cut -d, -f1 ~/.secrets/aios_owner_token); PASS=${PASS#*:}
-curl -s -H "Authorization: Bearer $PASS" localhost:8788/api/me                # {"user":"…"}
-curl -s -H "Authorization: Bearer $PASS" localhost:8788/api/sheets/unit-economics   # {"rows":[],…}
+curl -s -H "Authorization: Bearer $PASS" localhost:$P/api/me                # {"user":"…","workspace":"team"}
+curl -s -H "Authorization: Bearer $PASS" localhost:$P/api/sheets/unit-economics   # {"rows":[],…}
 kill %1
 ```
 
@@ -76,6 +80,13 @@ npx wrangler pages deploy public --project-name $PROJECT --branch main
 curl -s https://$PROJECT.pages.dev/api/healthz      # {"ok":true}
 curl -s https://$PROJECT.pages.dev/api/posts        # {"error":"unauthorized"}
 ```
+The first deploy can take ~30 s before `*.pages.dev` resolves. Secrets apply to new deployments, so set them before deploying (or redeploy after).
+
+**Optional: open signup (a public copy for many people).** Anyone can then create a private workspace from the login screen; each gets a one-time passcode (stored only as a SHA-256 hash), their own sheets and their own review queue. `OWNER_TOKEN` users keep sharing the `team` queue. Signups are rate-limited (5 per IP per hour).
+```bash
+printf 1 | npx wrangler pages secret put OPEN_SIGNUP --project-name $PROJECT   # then redeploy
+```
+Leave it unset on a private copy (`/api/signup` then returns 403).
 Give the owner the URL, and the passcode through a private channel only. Login is rate-limited (5 failures per IP per 10 minutes), but for anything beyond a solo owner, **put Cloudflare Access (Zero Trust → Access → Applications) in front of the site** so login is SSO and the passcode is a second factor.
 
 **Images (optional, R2):**
@@ -118,8 +129,10 @@ Each module names the sheet it fills. Write results there, not in chat.
 |---|---|---|
 | `GET /healthz` (Python) · `GET /api/healthz` (Cloudflare) | none | `{"ok":true}`, no auth |
 | `GET /tools.json` | none | sheet spec (tool ids, columns, formulas), no auth |
+| `GET /api/config` | none | `{"signup":true\|false}`, no auth |
+| `POST /api/signup` | `{"name":"<a-z0-9_->"}` | Cloudflare with `OPEN_SIGNUP=1` only: `{"user","passcode"}` (shown once) + session cookie; 403 closed, 409 taken, 429 rate-limited |
 | `POST /api/login` | `{"token":"<passcode>"}` | sets session cookie; 401 wrong; **429** after 5 failures/IP/10 min |
-| `GET /api/me` | none | `{"user":"<name>"}` |
+| `GET /api/me` | none | `{"user":"<name>","workspace":"team"\|"personal"}` (Python: `{"user"}`) |
 | `GET /api/settings` · `PUT /api/settings` | `{"currency":"€","offer_type":"digital"}` | per-user; offer_type ∈ physical, digital, service, local (relabels cost/logistics/sample columns) |
 | `GET /api/sheets` | none | `[{"tool","updated_at","n"}]` |
 | `GET /api/sheets/<tool>` | none | `{"tool","rows","updated_at","computed":[…],"kpis":[…]}`; `?raw=1` omits computed; unknown tool → 404 |

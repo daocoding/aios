@@ -1,4 +1,4 @@
 {
-  "_comment": "Single source for the hosted aiOS URL. Leave empty until a domain is chosen; the site and docs show (URL TBD).",
-  "hosted_url": ""
+  "_comment": "Single source for the hosted aiOS URL (public copy with open signup). The site and docs link to it.",
+  "hosted_url": "https://aios-grok.pages.dev"
 }

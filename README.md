@@ -3,7 +3,7 @@
 **An open, agent-runnable operating system for businesses that grow through the creator economy.**
 Your agents do the research, drafting, and analysis. You make the decisions. Every decision gets tested before it gets scaled.
 
-🌐 Hosted version: URL TBD (set once in [`site/aios.config.json`](site/aios.config.json)) · 🧠 Methodology: [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md) · 🤖 Agent setup: [`AGENT_SETUP.md`](AGENT_SETUP.md)
+🌐 Hosted version: **https://aios-grok.pages.dev** (create a free workspace; set once in [`site/aios.config.json`](site/aios.config.json)) · 🧠 Methodology: [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md) · 🤖 Agent setup: [`AGENT_SETUP.md`](AGENT_SETUP.md)
 
 ---
 
@@ -31,7 +31,7 @@ Any business that sells through creators, influencers, and short-form content: c
 | [`templates/xlsx/`](templates/xlsx/) · [`templates/aios-operating-sheets.xlsx`](templates/aios-operating-sheets.xlsx) | The same 16 sheets as Excel workbooks (formulas, dropdowns, sample rows); rebuild with `tools/build_xlsx.py` |
 | [`apps/content-review/`](apps/content-review/) | The human approval gate: full-width rows, select all, bulk approve. Python stdlib + SQLite, no dependencies |
 | [`cloudflare/`](cloudflare/) | The same approval app for Cloudflare Pages + Functions + D1, so it runs on *your* account |
-| [`site/`](site/) | The landing site (static); its hosted URL is TBD and configured in `site/aios.config.json` |
+| [`site/`](site/) | The landing site (static); its hosted URL (https://aios-grok.pages.dev) is configured in `site/aios.config.json` |
 
 ### The modules
 `00` Operating principles · `01` Opportunity & offer fit · `02` Creator partnerships · `03` Content engine · `04` Paid amplification · `05` Measure & learn · `06` Operating cadence · `07` AI-native team · `08` Channel flywheel
