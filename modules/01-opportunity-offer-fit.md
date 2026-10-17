@@ -11,21 +11,22 @@
 
 ## Procedure
 1. **Frame the real problem** (module 00 questions). Write `workspace/opportunity/<offer>/brief.md`.
-2. **Diagnose the market stage** (1 creator-led, 2 content + paid, 3 live/community/brand, 4 relationship assets) and how well your capabilities match it. Record which play and which first hire that implies.
-3. **Mine the pain.** Pull at least 100 reviews and comments from the top 5 competing offers. Cluster the complaints and estimate what customers already pay to solve each one (money, time, failed purchases). Segment by audience.
+2. **Diagnose the market stage** using CC's three stages (1.0 creator outreach, e.g. Latin America and newly opened EU markets; 2.0 short video + paid, e.g. the US; 3.0 live, private traffic and brand, e.g. Southeast Asia) and how well your capabilities match it. A 4th "owned audience" stage exists in the sheet as an aiOS addition. Record which play and first hire that implies, and the route CC suggests for your background (content-commerce veteran → US + Southeast Asia; marketplace-only → US + newly opened markets; marketplace-validated products → US + Southeast Asia).
+2b. **Check supply-chain capability** (lecture entry ladder: stage → demand → supply chain → play → small test). Can you source, make and restock at the needed price, quality and speed? If not, fix that before entering. Start with 1–2 SKUs.
+3. **Mine the pain.** Pull reviews and comments from the leading competing offers (aiOS default: at least 100 from the top 5). Cluster the complaints and estimate what customers already pay to solve each one (money, time, failed purchases). Segment by audience.
 4. **Enumerate selling points** and grade each one S/A/B/C (`templates/selling-points.csv`). Mark the candidate **core differentiator**.
 5. **Score the three axes** in `templates/offer-scorecard.md`: pain value, true cost, and content amplifiability ("can the differentiator be shown convincingly in 20 seconds?").
 6. **Price from value.** Estimate consumer surplus (cost of the old solution − your price) and producer surplus (price − full cost). Consider reframing the offer, for example from "improvement" to "solution to an urgent problem."
-7. **Run unit economics** with `tools/unit_economics.py`. Reserve a marketing budget (default 30%).
+7. **Run unit economics** with CC's full cost stack (Unit Economics sheet or `tools/unit_economics.py`): unit cost, first/last-mile logistics, warehousing, payout fee (e.g. 6% + $0.30 per order), other platform fees, refund reserve (5%), creator + ads allocation (30%). Running the tool with no arguments reproduces CC's $29.99 example: 56.08% gross, 26.08% company margin.
 8. **Classify** the offer as profit product, traffic product, or drop (rules below).
 9. **Design the minimum viable test:** small batch size, a 30-day sprint plan, three read-outs, and kill criteria. Fill in `templates/launch-plan.md`, including Plan B and Plan C.
 10. Submit the launch plan for owner approval.
 
 ## Decision rules
-- Value gap ≫ cost → **prioritize** as a profit product.
-- Gross margin around 50–60% with a thin value gap → **traffic product**. Good for testing, but not the profit engine.
+- Value gap ≫ cost → **prioritize** as a profit product (aiOS default: ≥60% gross margin with positive consumer surplus; the lecture gives no number).
+- Gross margin around 50–60% with a thin value gap → **traffic product** (lecture). Testable, don't bet heavy, win on efficiency.
 - Value < full cost → **drop**. You can't win a price war.
-- If the differentiator can't be shown in a short video → downgrade one level, whatever the score.
+- If the differentiator can't be shown in a short video → downgrade one level, whatever the score (aiOS default).
 - Feature stacking that blurs the audience or raises cost without raising value → reject.
 - Before committing bulk inventory, you need three independent signals: engagement on test content, creator feedback after trying the product, and real conversions at the target price.
 - The plan must survive three consecutive "why?" questions (why this product, why this audience, why you think it will sell).
@@ -56,5 +57,5 @@ Be explicit about uncertainty. Never recommend bulk commitment on fewer than 3 i
 - **Operating Sheets:** `market-stage`, `offer-scorecard`, `unit-economics`, `test-sprint`, `launch-plan` (in-app at `/tools`, or `templates/xlsx/`).
 - **Prove the loop with an existing product first.** Before committing to your own SKU, run the account selling a proven product from another brand (affiliate or partner). It teaches you the audience, hooks and creator types at almost no inventory risk. (Test Sprint row "0".)
 - Copy only winners from the last 1–2 months; older ones are saturated (Offer Scorecard: recency check).
-- Count cash locked across batches in motion (stock, in transit, in production) against a cap (Offer Scorecard: cash exposure).
+- Count the **three batches** of cash in motion (selling in the destination warehouse, at sea, in production) against a cap; this is CC's argument against blind stocking (Offer Scorecard: three batch columns → cash exposure).
 - Non-physical offers: switch **Offer type** in the Operating Sheets header; cost, logistics and sample columns relabel to delivery cost, onboarding and free trials.

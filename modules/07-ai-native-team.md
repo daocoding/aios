@@ -28,7 +28,7 @@ Don't paste a "perfect AI org" onto a real company. Upgrade it one workflow at a
 Operator (status and priorities) · Opportunity Analyst (01) · Creator Partnerships (02) · Content Engine (03) · Paid Analyst (04) · Measurement (05) · Finance check (unit economics and spend vs. targets).
 
 ## Metric
-Revenue per person (people + agents). Expect AI to lift it materially. Hire for the size of business a person plus agents can drive.
+Revenue per person (people + agents). Lecture benchmarks: ≈$0.86M per person per year for a good e-commerce team, ≈$1.1–1.4M with AI, ≈$0.3–0.4M in bloated teams (converted at ~7:1). Hire for the size of business a person plus agents can drive.
 
 ## Field notes (v2)
 - AI owns: market insight, selection analysis, creator outreach, video breakdown, ad diagnosis, data review. Humans own: problem definition, standards, process design, judging results, training the system.

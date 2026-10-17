@@ -14,7 +14,7 @@ Creator & short-video platforms ──ignite──▶ Marketplaces ──capture
 ## What to measure
 - Branded search volume and marketplace sales after content pushes (look for the lag)
 - Owned-channel signups and repeat rate
-- Blended customer acquisition cost across channels, not per channel
+- Blended customer acquisition cost across channels, not per channel (aiOS addition; the lecture judges total business lift)
 
 ## Decision rules
 - If a video push lifts marketplace sales, credit the content when deciding budgets.
@@ -25,3 +25,4 @@ Platform windows let you win once. The method lets you keep winning when the mar
 
 ## Field notes (v2)
 - Engine (creator platforms) → base (marketplaces) → profit pool (owned store/community) → moat (brand). Judge total business lift, not one dashboard.
+- Proof case (lecture): a marketplace seller took ~8 years to reach ≈$6.4M a year; a newcomer took the short-video channel to ≈$7.1M in 18 months and lifted the marketplace by nearly the same amount, to ≈$14M, almost all through brand-name search.
