@@ -86,6 +86,7 @@ async function api(p,b){const r=await fetch(p,b?{method:'POST',headers:{'Content
 function show(a){$('#login').hidden=a;$('#app').hidden=!a}
 async function login(){const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:$('#pw').value})});if(r.ok){$('#pw').value='';load()}else $('#lerr').textContent='Wrong passcode'}
 $('#pw').addEventListener('keydown',e=>e.key=='Enter'&&login());
+window.aiosAfterLogin=()=>load();
 function xlen(s){s=(s||'').replace(/https?:\/\/\S+/g,'x'.repeat(23));let n=0;for(const ch of s){const c=ch.codePointAt(0);n+=(c<=0x10FF||(c>=0x2000&&c<=0x200D)||(c>=0x2010&&c<=0x201F)||(c>=0x2032&&c<=0x2037))?1:2}return n}
 const tz={timeZone:'America/New_York'};
 const dayKey=iso=>new Date(iso).toLocaleDateString('en-US',{...tz,weekday:'short',month:'short',day:'numeric'});
@@ -179,4 +180,5 @@ document.addEventListener('keydown',e=>{
 });
 async function load(){try{posts=await api('/api/posts');show(true);render()}catch(e){}}
 load();
-</script></body></html>
+</script><script src="/signup.js"></script>
+</body></html>

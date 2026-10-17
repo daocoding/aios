@@ -28,7 +28,7 @@ tfoot td{background:#fafafa;font-weight:600;padding:7px 8px}
 #login{max-width:340px;margin:12vh auto;background:var(--card);padding:24px;border:1px solid var(--line);border-radius:12px}#login input{width:100%;padding:10px;margin:10px 0;border:1px solid var(--line);border-radius:8px}
 @media(max-width:800px){.layout{grid-template-columns:1fr}aside{display:flex;overflow:auto;gap:4px}aside button{white-space:nowrap;width:auto}}
 </style></head><body>
-<header><div class="logo" id="logo"></div><h1>aiOS <span style="color:var(--mute);font-weight:500">Operating Sheets</span></h1><span class="sp"></span><label style="color:var(--soft)">Offer type <select id="otype" onchange="setSetting('offer_type',this.value)"><option value="physical">Physical goods</option><option value="digital">Digital / app / course</option><option value="service">Service</option><option value="local">Local business</option></select></label><label style="color:var(--soft)">Currency <select id="curr" onchange="setSetting('currency',this.value)"><option>$</option><option>€</option><option>£</option><option>¥</option><option>₹</option><option>R$</option><option>A$</option><option>C$</option><option>CHF </option><option>kr </option></select></label><a href="/">Content Review</a><span id="who" style="color:var(--mute)"></span></header>
+<header><div class="logo" id="logo"></div><h1>aiOS <span style="color:var(--mute);font-weight:500">Operating Sheets</span></h1><span class="sp"></span><label style="color:var(--soft)">Offer type <select id="otype" onchange="setSetting('offer_type',this.value)"><option value="physical">Physical goods</option><option value="digital">Digital / app / course</option><option value="service">Service</option><option value="local">Local business</option></select></label><label style="color:var(--soft)">Currency <select id="curr" onchange="setSetting('currency',this.value)"><option>$</option><option>€</option><option>£</option><option>¥</option><option>₹</option><option>R$</option><option>A$</option><option>C$</option><option>CHF </option><option>kr </option></select></label><a href="/review">Content Review</a><span id="who" style="color:var(--mute)"></span></header>
 <div id="login" hidden><h3>Passcode</h3><input id="pw" type="password" placeholder="Passcode"><button class="btn pri" onclick="login()">Unlock</button><p id="lerr" style="color:var(--bad)"></p></div>
 <div class="layout" id="app" hidden><aside id="nav"></aside><main id="main"></main></div>
 <input type="file" id="file" accept=".csv,.xlsx" hidden>
@@ -45,6 +45,7 @@ async function setSetting(k,v){SET=await api('PUT','/api/settings',{[k]:v});S.cu
 function show(ok){$('#login').hidden=ok;$('#app').hidden=!ok}
 async function login(){const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:$('#pw').value})});if(r.ok){$('#pw').value='';init()}else $('#lerr').textContent='Wrong passcode'}
 $('#pw').addEventListener('keydown',e=>e.key=='Enter'&&login());
+window.aiosAfterLogin=()=>init();
 async function init(){
   TOOLS=(await (await fetch('tools.json')).json()).tools;
   let me;try{me=await api('GET','/api/me')}catch{return}show(true);$('#who').textContent='· '+me.user;
@@ -113,4 +114,5 @@ $('#file').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)r
   catch(err){alert('Import failed: '+err)}});
 window.addEventListener('hashchange',()=>{const id=location.hash.slice(1);if(cur&&id!=cur.id)openTool(id)});
 init();
-</script></body></html>
+</script><script src="/signup.js"></script>
+</body></html>

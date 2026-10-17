@@ -168,7 +168,9 @@ class H(BaseHTTPRequestHandler):
 
     def do_GET(self):
         u = urlparse(self.path); qs = parse_qs(u.query)
-        if u.path in ("/", "/index.html"): return self.static("index.html", "text/html; charset=utf-8")
+        if u.path in ("/", "/index.html", "/review", "/review.html"): return self.static("index.html", "text/html; charset=utf-8")
+        if u.path == "/signup.js": return self.static("signup.js", "text/javascript; charset=utf-8")
+        if u.path == "/api/config": return self.send_json(200, {"signup": False})  # open signup is a Cloudflare-copy feature
         if u.path in ("/tools", "/tools.html"): return self.static("tools.html", "text/html; charset=utf-8")
         if u.path == "/tools.json": return self.static("tools.json", "application/json")
         if u.path == "/sheets.js": return self.static("sheets.js", "text/javascript; charset=utf-8")
