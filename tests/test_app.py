@@ -6,6 +6,10 @@ APP = os.path.join(ROOT, "apps", "content-review")
 sys.path.insert(0, APP)
 import sheets_engine as E
 
+# CC's worked example from the lecture's true-total-cost slide (unit cost shown there as $3.57).
+CC_EXAMPLE = {"offer": "cc", "price": 29.99, "unit_cost": 3.5718, "logistics": 6, "warehousing": 0, "payout_pct": 0.06,
+              "payout_fixed": 0.3, "platform_pct": 0, "refund_pct": 0.05, "marketing_pct": 0.3, "fx": 7}
+
 def free_port():
     s = socket.socket(); s.bind(("127.0.0.1", 0)); p = s.getsockname()[1]; s.close(); return p
 
@@ -48,10 +52,11 @@ class AppTest(unittest.TestCase):
         _, lst = self.req("GET", "/api/sheets"); self.assertNotIn("bogus", [x["tool"] for x in lst])
 
     def test_computed_values_on_get(self):
-        self.req("PUT", "/api/sheets/unit-economics", [{"offer": "x", "price": 49.99, "unit_cost": 8, "logistics": 7, "platform_pct": 0.06, "payment_pct": 0.03, "refund_pct": 0.05, "marketing_pct": 0.3}])
+        self.req("PUT", "/api/sheets/unit-economics", [CC_EXAMPLE])
         _, d = self.req("GET", "/api/sheets/unit-economics")
         c = d["computed"][0]
-        self.assertEqual(c["verdict"], "Traffic product"); self.assertAlmostEqual(c["breakeven_roas"], 1.786, places=2)
+        self.assertEqual(c["verdict"], "Traffic product"); self.assertAlmostEqual(c["gm"], 0.5608, places=4)
+        self.assertAlmostEqual(c["op_pct"], 0.2608, places=4); self.assertAlmostEqual(c["breakeven_roas"], 1.783, places=2)
         _, d = self.req("GET", "/api/sheets/unit-economics?raw=1"); self.assertNotIn("computed", d)
 
     def test_formula_keys_dropped_on_save(self):
@@ -95,6 +100,44 @@ class EngineTest(unittest.TestCase):
             o = E.compute_row(self.T["offer-scorecard"], {"price": 100, "full_cost": 100 * (1 - gm), "old_cost": 200})
             u = E.compute_row(self.T["unit-economics"], {"price": 100, "unit_cost": 100 * (1 - gm)})
             self.assertEqual(o["class"], want); self.assertEqual(u["verdict"], want)
+    def test_cc_unit_economics_example(self):
+        c = E.compute_row(self.T["unit-economics"], CC_EXAMPLE)
+        self.assertEqual(round(c["payout_fee"], 2), 2.10)          # 6% + $0.30
+        self.assertEqual(round(c["fee_share"] * 100, 2), 7.00)     # the slide's 7.00% platform fixed fee
+        self.assertEqual(round(c["landed_share"] * 100, 2), 31.92)
+        self.assertEqual(round(c["fixed_share"] * 100, 2), 38.92)
+        self.assertEqual(round(c["gm"] * 100, 2), 56.08)
+        self.assertEqual(round(c["op_pct"] * 100, 2), 26.08)
+        self.assertEqual(round(c["op_home"], 2), 54.76)
+        self.assertEqual(c["verdict"], "Traffic product")
+        # warehousing is part of the stack
+        w = E.compute_row(self.T["unit-economics"], {**CC_EXAMPLE, "warehousing": 1.5})
+        self.assertAlmostEqual(c["gm"] - w["gm"], 1.5 / 29.99, places=5)
+    def test_unit_economics_cli_matches(self):
+        out = json.loads(subprocess.run([sys.executable, os.path.join(ROOT, "tools", "unit_economics.py"), "--json"], capture_output=True, text=True, check=True).stdout)
+        self.assertEqual((out["landed_share_pct"], out["fixed_share_pct"], out["gross_margin_pct"], out["company_margin_pct"], out["company_margin_home"]), (31.92, 38.92, 56.08, 26.08, 54.76))
+    def test_ad_stop_loss(self):
+        t = self.T["ad-diagnosis"]; base = {"role": "Harvest", "stage": "0→1 validate", "spend": 500, "revenue": 520, "breakeven": 2.6, "conversions": 12}
+        self.assertTrue(E.compute_row(t, base)["priority"].startswith("Learning"))
+        self.assertTrue(E.compute_row(t, {**base, "stop_loss": 250})["priority"].startswith("Stop-loss hit"))
+        self.assertTrue(E.compute_row(t, {**base, "stop_loss": 400})["priority"].startswith("Learning"))
+    def test_scale_ceiling(self):
+        t = self.T["scale-ceiling"]
+        self.assertTrue(E.compute_row(t, {"spend_prev": 2000, "spend": 3000, "profit_prev": 5200, "profit": 5050})["verdict"].startswith("Ceiling"))
+        self.assertEqual(E.compute_row(t, {"spend_prev": 2000, "spend": 3000, "profit_prev": 5000, "profit": 5600, "cvr_prev": .03, "cvr": .031, "fresh": 3})["verdict"], "Keep scaling in steps")
+    def test_market_stage_three_cc_stages_and_supply_gate(self):
+        t = self.T["market-stage"]
+        self.assertIn("aiOS addition", E.compute_row(t, {"stage": "4"})["play"])
+        self.assertNotIn("aiOS addition", E.compute_row(t, {"stage": "3"})["play"])
+        self.assertTrue(E.compute_row(t, {"supply_fit": 2})["supply_gate"].startswith("Fix supply"))
+        self.assertIn("Southeast Asia", E.compute_row(t, {"background": "Content-commerce veteran"})["route"])
+    def test_three_batch_cash(self):
+        c = E.compute_row(self.T["offer-scorecard"], {"cash_wh": 3000, "cash_transit": 3000, "cash_prod": 3000, "cash_cap": 8000})
+        self.assertEqual(c["cash_tied"], 9000); self.assertTrue(c["cash_check"].startswith("Over cap"))
+    def test_six_second_gate(self):
+        t = self.T["asset-log"]
+        self.assertTrue(E.compute_row(t, {"views": 1000, "retention_6s": 0.55})["triage"].startswith("P0"))
+        self.assertNotEqual(E.compute_row(t, {"views": 1000, "retention_6s": 0.62, "role": "Seed"})["triage"][:2], "P0")
     def test_js_parity(self):
         out = subprocess.run(["node", os.path.join(ROOT, "tests", "engine_parity.mjs")], capture_output=True, text=True, check=True).stdout
         js = json.loads(out)

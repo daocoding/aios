@@ -23,11 +23,12 @@ Any business that sells through creators, influencers, and short-form content: c
 | Path | What it is |
 |---|---|
 | [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md) | The theory: the Verified Growth Method (principles, the six traps, frameworks, decision rules, loops) |
+| [`docs/LECTURE-EVIDENCE.md`](docs/LECTURE-EVIDENCE.md) | The practitioner layer: lecture numbers, cases and decision rules with timestamps (what is lecture vs. aiOS default is listed in METHODOLOGY §10) |
 | [`modules/`](modules/) | Nine agent-runnable playbooks, each with procedure, decision rules, outputs, a human gate, and a pasteable agent prompt |
 | [`templates/`](templates/) | Hypothesis ledger, offer scorecard, launch plan, outreach, creator brief, hook library, asset log, creator pipeline, weekly review, role manual |
 | [`tools/unit_economics.py`](tools/unit_economics.py) | Price → margin → "profit product / traffic product / drop" classifier |
-| **Operating Sheets** (`/tools` in the app) | 15 live spreadsheets with formulas, saved per user, CSV/XLSX import and export: owner self-check, market stage, offer scorecard, unit economics, selling points, hook library, content positioning, asset log, creator pipeline, ad diagnosis, hypothesis ledger, test sprint, launch plan, weekly review, role KPIs |
-| [`templates/xlsx/`](templates/xlsx/) · [`templates/aios-operating-sheets.xlsx`](templates/aios-operating-sheets.xlsx) | The same 15 sheets as Excel workbooks (formulas, dropdowns, sample rows); rebuild with `tools/build_xlsx.py` |
+| **Operating Sheets** (`/tools` in the app) | 16 live spreadsheets with formulas, saved per user, CSV/XLSX import and export: owner self-check, market stage, offer scorecard, unit economics, selling points, hook library, content positioning, asset log, creator pipeline, ad diagnosis, scale ceiling test, hypothesis ledger, test sprint, launch plan, weekly review, role KPIs |
+| [`templates/xlsx/`](templates/xlsx/) · [`templates/aios-operating-sheets.xlsx`](templates/aios-operating-sheets.xlsx) | The same 16 sheets as Excel workbooks (formulas, dropdowns, sample rows); rebuild with `tools/build_xlsx.py` |
 | [`apps/content-review/`](apps/content-review/) | The human approval gate: full-width rows, select all, bulk approve. Python stdlib + SQLite, no dependencies |
 | [`cloudflare/`](cloudflare/) | The same approval app for Cloudflare Pages + Functions + D1, so it runs on *your* account |
 | [`site/`](site/) | The landing site (static); its hosted URL is TBD and configured in `site/aios.config.json` |
@@ -45,7 +46,7 @@ git clone -b aios-grok-edition https://github.com/daocoding/aios.git
 1. Read [`modules/00-operating-principles.md`](modules/00-operating-principles.md). It takes five minutes.
 2. Give your agent this repo and say: *"Set up aiOS for my business by following AGENT_SETUP.md."*
 3. Answer its intake questions (offer, audience, channels, budget caps).
-4. In **Operating Sheets**, follow the *Start here: 30-day path* in the sidebar (day 1: Owner Self-Check + Unit Economics; days 1–3: Offer Scorecard + Launch Plan; week 1: Selling Points + Creator Pipeline; weeks 2–4: Asset Log + Ad Diagnosis; weekly: Hypothesis Ledger + Weekly Review). You don't need all 15 sheets on day one.
+4. In **Operating Sheets**, follow the *Start here: 30-day path* in the sidebar (day 1: Owner Self-Check + Unit Economics; days 1–3: Offer Scorecard + Launch Plan; week 1: Selling Points + Creator Pipeline; weeks 2–4: Asset Log + Ad Diagnosis; when scaling: Scale Ceiling; weekly: Hypothesis Ledger + Weekly Review). You don't need all 16 sheets on day one.
 5. Each day, open your Content Review page and approve, edit, or send back what your agents drafted. Keep the numbers in **Operating Sheets** (link in the header).
 
 ## Quick start (agent)

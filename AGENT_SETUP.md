@@ -105,7 +105,7 @@ Conventions: `pillar` = module or campaign, `operator_note` = the hypothesis ID 
 Publish **only** items with `status=approved`. Re-read `owner_comment` on `changes_requested`, revise, and set the status back to `draft`.
 
 ## 4b. Operating Sheets (numbers live here)
-The app serves `/tools`: 15 spreadsheets defined in `tools.json`. Discover tool ids and column keys at the unauthenticated **`GET /tools.json`** (or `cli.py sheet tools`). Formulas are evaluated **on the server** too, so you can read the decisions (verdicts, priorities, KPIs).
+The app serves `/tools`: 16 spreadsheets defined in `tools.json`. Discover tool ids and column keys at the unauthenticated **`GET /tools.json`** (or `cli.py sheet tools`). Formulas are evaluated **on the server** too, so you can read the decisions (verdicts, priorities, KPIs).
 ```bash
 python3 apps/content-review/cli.py sheet get unit-economics          # rows + computed + kpis
 python3 apps/content-review/cli.py sheet put unit-economics rows.json --base <updated_at from get>

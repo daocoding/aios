@@ -28,9 +28,11 @@ await t("unknown tool 404", async () => {
   assert.ok(!(await call("GET", "/api/sheets"))[1].some(x => x.tool === "bogus"));
 });
 await t("computed on GET", async () => {
-  await call("PUT", "/api/sheets/unit-economics", [{ offer: "x", price: 49.99, unit_cost: 8, logistics: 7, platform_pct: 0.06, payment_pct: 0.03, refund_pct: 0.05, marketing_pct: 0.3 }]);
-  const [, d] = await call("GET", "/api/sheets/unit-economics");
-  assert.equal(d.computed[0].verdict, "Traffic product"); assert.ok(Math.abs(d.computed[0].breakeven_roas - 1.786) < 0.01);
+  await call("PUT", "/api/sheets/unit-economics", [{ offer: "cc", price: 29.99, unit_cost: 3.5718, logistics: 6, warehousing: 0, payout_pct: 0.06, payout_fixed: 0.3, platform_pct: 0, refund_pct: 0.05, marketing_pct: 0.3, fx: 7 }]);
+  const [, d] = await call("GET", "/api/sheets/unit-economics"); const c = d.computed[0], r2 = x => Math.round(x * 10000) / 100;
+  assert.equal(c.verdict, "Traffic product"); assert.ok(Math.abs(c.breakeven_roas - 1.783) < 0.01);
+  // CC's worked example (lecture slide): 31.92% landed, 38.92% fixed, 56.08% gross, 26.08% company, 54.76 home currency
+  assert.deepEqual([r2(c.landed_share), r2(c.fee_share), r2(c.fixed_share), r2(c.gm), r2(c.op_pct), Math.round(c.op_home * 100) / 100], [31.92, 7, 38.92, 56.08, 26.08, 54.76]);
   assert.ok(!("computed" in (await call("GET", "/api/sheets/unit-economics?raw=1"))[1]));
 });
 await t("optimistic locking 409", async () => {

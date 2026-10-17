@@ -1,4 +1,4 @@
-# Creator outreach templates (one per segment; keep each under 120 words)
+# Creator outreach templates (one per segment; keep each short — aiOS default: under 120 words)
 
 **Subject:** <specific to their content>, e.g. "Your <topic> videos + a <problem> fix your followers keep asking about"
 

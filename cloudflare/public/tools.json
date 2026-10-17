@@ -113,7 +113,7 @@
    "id": "market-stage",
    "module": "01",
    "title": "Market Stage & Fit",
-   "purpose": "Choose markets/channels by maturity stage and how well they fit your current capabilities. The play decides the org chart.",
+   "purpose": "Choose markets/channels by maturity stage and fit with your capabilities (CC's entry ladder: read the stage → validate demand → match supply-chain capability → choose creators / own content / ads → small test, then replicate; start with 1–2 SKUs). Stages 1–3 and their example markets are CC's (lecture slide); stage 4 'owned audience' is an aiOS addition. The fit-score weighting is an aiOS default, not a lecture formula.",
    "columns": [
     {
      "key": "market",
@@ -123,7 +123,7 @@
     },
     {
      "key": "stage",
-     "label": "Market maturity (1 creator-led · 2 content+paid · 3 live+brand · 4 owned audience)",
+     "label": "Market stage (CC: 1 creator outreach e.g. Latin America, newly opened EU markets · 2 short video + paid e.g. US · 3 live, private traffic, brand e.g. Southeast Asia · 4 owned audience = aiOS addition)",
      "type": "select",
      "options": [
       "1",
@@ -159,16 +159,46 @@
      "type": "number"
     },
     {
-     "key": "score",
-     "label": "Fit score",
+     "key": "supply_fit",
+     "label": "Supply-chain capability fit (1-5): can you source, make and restock this at the needed price, quality and speed?",
+     "type": "number"
+    },
+    {
+     "key": "background",
+     "label": "Your background",
+     "type": "select",
+     "options": [
+      "",
+      "Content-commerce veteran",
+      "Marketplace-only seller",
+      "Marketplace-validated products"
+     ],
+     "w": 170
+    },
+    {
+     "key": "route",
+     "label": "CC's suggested route for that background",
      "type": "formula",
-     "f": "ROUND(({size}+{price_level}+2*{capability_fit})-({competition}+{barriers})/2,1)"
+     "w": 260,
+     "f": "IF({background}=\"Content-commerce veteran\",\"Mature content markets (CC: US + Southeast Asia)\",IF({background}=\"Marketplace-only seller\",\"US + newly opened markets (crowded mature markets punish beginners)\",IF({background}=\"Marketplace-validated products\",\"US + Southeast Asia: open a new channel on proven products\",\"\")))"
+    },
+    {
+     "key": "score",
+     "label": "Fit score (aiOS default weighting)",
+     "type": "formula",
+     "f": "ROUND(({size}+{price_level}+2*{capability_fit}+{supply_fit})-({competition}+{barriers})/2,1)"
+    },
+    {
+     "key": "supply_gate",
+     "label": "Supply-chain gate",
+     "type": "formula",
+     "f": "IF({supply_fit}=0,\"Rate supply fit\",IF({supply_fit}<3,\"Fix supply first - don't enter yet\",\"OK\"))"
     },
     {
      "key": "play",
      "label": "Implied play",
      "type": "formula",
-     "f": "IF({stage}=\"1\",\"Creator seeding; hire partnerships\",IF({stage}=\"2\",\"Own short video + paid; hire shoot/edit + media buyer\",IF({stage}=\"3\",\"Live selling, brand, multi-channel\",IF({stage}=\"4\",\"Owned audience: community, direct list, repeat purchase\",\"\"))))",
+     "f": "IF({stage}=\"1\",\"Creator outreach and seeding; hire partnerships\",IF({stage}=\"2\",\"Own short video + paid; hire shoot/edit + media buyer\",IF({stage}=\"3\",\"Live selling, private traffic (community), brand; multi-channel\",IF({stage}=\"4\",\"(aiOS addition) Owned audience: community, direct list, repeat purchase\",\"\"))))",
      "w": 260
     },
     {
@@ -198,7 +228,7 @@
    ],
    "sample": [
     {
-     "market": "Example: new region on a short-video shop",
+     "market": "Example: newly opened market on a short-video shop",
      "stage": "1",
      "size": 3,
      "price_level": 4,
@@ -206,7 +236,9 @@
      "capability_fit": 3,
      "barriers": 3,
      "notes": "Plug/size standards, returns norms",
-     "creator_stage": "1"
+     "creator_stage": "1",
+     "supply_fit": 4,
+     "background": "Marketplace-only seller"
     }
    ]
   },
@@ -214,7 +246,7 @@
    "id": "offer-scorecard",
    "module": "01",
    "title": "Offer Scorecard (Product Selection Log)",
-   "purpose": "Score every candidate on the three axes (pain value, true cost, content amplifiability) and price from value. Value gap decides: prioritize / traffic / drop. One rule shared with Unit Economics: GM ≥60% with positive consumer surplus = Profit product; 50–60% = Traffic product; below 50% = Thin (rework); no margin left = Drop.",
+   "purpose": "Score every candidate on the three axes (pain value, true cost, content amplifiability) and price from value. Value gap decides: prioritize / traffic / drop. One rule shared with Unit Economics (the 60% cut-off is an aiOS default; CC gives ≈50–60% = traffic product): GM ≥60% with positive consumer surplus = Profit product; 50–60% = Traffic product; below 50% = Thin (rework); no margin left = Drop. Cash check: CC's 'three batches in motion' (one selling in the destination warehouse, one in transit, one in production) all lock cash at once — the argument against blind stocking.",
    "columns": [
     {
      "key": "offer",
@@ -310,14 +342,41 @@
      "w": 130
     },
     {
-     "key": "cash_tied",
-     "label": "Cash tied up across batches in motion (stock + in transit + in production)",
+     "key": "cash_wh",
+     "label": "Batch 1: stock in destination warehouse ($)",
      "type": "money",
      "alt": {
-      "digital": "Cash committed before launch (build, content, ads)",
-      "service": "Cash committed before launch (hiring, tools, ads)",
-      "local": "Cash committed (stock, fit-out, ads)"
+      "digital": "Build / content cost committed ($)",
+      "service": "Hiring / tools committed ($)",
+      "local": "Stock on hand ($)"
      }
+    },
+    {
+     "key": "cash_transit",
+     "label": "Batch 2: stock in transit ($)",
+     "type": "money",
+     "alt": {
+      "digital": "Pre-launch ads committed ($)",
+      "service": "Pre-launch ads committed ($)",
+      "local": "Fit-out / deposits ($)"
+     }
+    },
+    {
+     "key": "cash_prod",
+     "label": "Batch 3: stock in production ($)",
+     "type": "money",
+     "alt": {
+      "digital": "Next build committed ($)",
+      "service": "Next hires committed ($)",
+      "local": "Next order committed ($)"
+     }
+    },
+    {
+     "key": "cash_tied",
+     "label": "Cash locked across the three batches",
+     "type": "formula",
+     "f": "{cash_wh}+{cash_transit}+{cash_prod}",
+     "fmt": "money"
     },
     {
      "key": "cash_cap",
@@ -328,7 +387,7 @@
      "key": "cash_check",
      "label": "Cash exposure",
      "type": "formula",
-     "f": "IF({cash_cap}=0,\"Set a cap\",IF({cash_tied}>{cash_cap},\"Over cap - shrink batch\",\"OK\"))"
+     "f": "IF({cash_cap}=0,\"Set a cap\",IF({cash_tied}>{cash_cap},\"Over cap - three batches lock too much cash; shrink the batch\",\"OK\"))"
     },
     {
      "key": "signals",
@@ -365,8 +424,10 @@
      "signals": 1,
      "decision": "Test",
      "winner_age": 1,
-     "cash_tied": 6000,
-     "cash_cap": 10000
+     "cash_cap": 10000,
+     "cash_wh": 2500,
+     "cash_transit": 2000,
+     "cash_prod": 1500
     }
    ],
    "tab": "Offer Scorecard"
@@ -375,7 +436,7 @@
    "id": "unit-economics",
    "module": "01",
    "title": "Unit Economics (price → margin)",
-   "purpose": "Work backwards from price: production, logistics, platform & payment fees, refunds, marketing reserve → operating margin. Same rule as Offer Scorecard: GM ≥60% with positive consumer surplus = Profit product; 50–60% = Traffic product; below 50% = Thin (rework); no margin left = Drop.",
+   "purpose": "CC's true-total-cost stack (lecture slide, Step 3): profit = price − (unit cost + first/last-mile logistics + warehousing + payout/platform fees + refunds + creator commission/ads). Payout fee = price × % + fixed per order (CC: 6% + $0.30, which is 7.00% of a $29.99 price — the slide's 'platform fixed fee' line). Fixed-cost share = landed share + fee share; gross margin (max commission) = 1 − fixed share − refund reserve; company margin = gross margin − creator+ads allocation (CC: 30%). The sample row reproduces CC's worked example: 31.92% → 38.92% → 56.08% → 26.08% → 54.76 in home currency (FX 7). Classification follows CC's value-gap triage; the 60% profit-product cut-off is an aiOS default (CC only gives ≈50–60% = traffic product).",
    "columns": [
     {
      "key": "offer",
@@ -390,7 +451,7 @@
     },
     {
      "key": "unit_cost",
-     "label": "Production cost ($)",
+     "label": "Unit cost ($)",
      "type": "money",
      "alt": {
       "digital": "Delivery cost per sale: hosting, licences, support ($)",
@@ -400,7 +461,7 @@
     },
     {
      "key": "logistics",
-     "label": "Logistics in+out ($)",
+     "label": "Logistics: first + last mile ($)",
      "type": "money",
      "alt": {
       "digital": "Fulfilment / onboarding cost ($)",
@@ -409,75 +470,145 @@
      }
     },
     {
-     "key": "platform_pct",
-     "label": "Platform commission %",
+     "key": "warehousing",
+     "label": "Warehousing / storage per unit ($)",
+     "type": "money",
+     "alt": {
+      "digital": "Infrastructure per sale ($)",
+      "service": "Facilities per client ($)",
+      "local": "Storage / premises per sale ($)"
+     }
+    },
+    {
+     "key": "payout_pct",
+     "label": "Payout / transaction fee % (CC: 6%)",
      "type": "pct"
     },
     {
-     "key": "payment_pct",
-     "label": "Payment / payout fees %",
+     "key": "payout_fixed",
+     "label": "Payout fee fixed per order ($, CC: 0.30)",
+     "type": "money"
+    },
+    {
+     "key": "platform_pct",
+     "label": "Other platform fees % (referral etc.; 0 if already in the payout fee)",
      "type": "pct"
     },
     {
      "key": "refund_pct",
-     "label": "Refund rate %",
+     "label": "Refund reserve % (CC: 5%)",
      "type": "pct"
     },
     {
      "key": "marketing_pct",
-     "label": "Marketing reserve % (creators+ads)",
+     "label": "Creator commission + ads % (CC: 30%)",
      "type": "pct"
     },
     {
-     "key": "contribution",
-     "label": "Contribution ($)",
+     "key": "fx",
+     "label": "Exchange rate to home currency (optional)",
+     "type": "num2"
+    },
+    {
+     "key": "payout_fee",
+     "label": "Payout fee ($)",
      "type": "formula",
-     "f": "{price}-{unit_cost}-{logistics}-{price}*({platform_pct}+{payment_pct}+{refund_pct})",
+     "f": "{price}*{payout_pct}+{payout_fixed}",
      "fmt": "money"
     },
     {
-     "key": "gm",
-     "label": "Gross margin %",
+     "key": "landed_share",
+     "label": "Landed cost share (cost+logistics+warehousing)/price",
      "type": "formula",
-     "f": "IFERROR({contribution}/{price},0)",
+     "f": "IFERROR(({unit_cost}+{logistics}+{warehousing})/{price},0)",
      "fmt": "pct"
     },
     {
-     "key": "op_margin",
-     "label": "Operating margin ($)",
+     "key": "fee_share",
+     "label": "Platform fee share (payout fee/price + other)",
      "type": "formula",
-     "f": "{contribution}-{price}*{marketing_pct}",
+     "f": "IFERROR({payout_fee}/{price},0)+{platform_pct}",
+     "fmt": "pct"
+    },
+    {
+     "key": "fixed_share",
+     "label": "Fixed-cost share",
+     "type": "formula",
+     "f": "{landed_share}+{fee_share}",
+     "fmt": "pct"
+    },
+    {
+     "key": "gm",
+     "label": "Gross margin % (max room for creators+ads)",
+     "type": "formula",
+     "f": "IF({price}>0,1-{fixed_share}-{refund_pct},0)",
+     "fmt": "pct"
+    },
+    {
+     "key": "contribution",
+     "label": "Contribution before creators+ads ($)",
+     "type": "formula",
+     "f": "{price}*{gm}",
      "fmt": "money"
     },
     {
      "key": "op_pct",
-     "label": "Operating margin %",
+     "label": "Company margin %",
      "type": "formula",
-     "f": "IFERROR({op_margin}/{price},0)",
+     "f": "IF({price}>0,{gm}-{marketing_pct},0)",
      "fmt": "pct"
     },
     {
+     "key": "op_margin",
+     "label": "Company margin ($)",
+     "type": "formula",
+     "f": "{price}*{op_pct}",
+     "fmt": "money"
+    },
+    {
+     "key": "op_home",
+     "label": "Company margin in home currency",
+     "type": "formula",
+     "f": "IF({fx}>0,{op_margin}*{fx},\"\")",
+     "fmt": "num2"
+    },
+    {
      "key": "breakeven_roas",
-     "label": "Break-even ad ROAS",
+     "label": "Break-even ad ROAS (1 ÷ gross margin)",
      "type": "formula",
      "f": "IFERROR({price}/{contribution},0)",
      "fmt": "num2"
     },
     {
      "key": "verdict",
-     "label": "Verdict",
+     "label": "Verdict (60% cut-off = aiOS default)",
      "type": "formula",
-     "f": "IF({op_margin}<=0,\"Drop\",IF({gm}>=0.6,\"Profit product\",IF({gm}>=0.5,\"Traffic product\",\"Thin - rework\")))"
+     "f": "IF(OR({op_margin}<=0,{contribution}<=0),\"Drop\",IF({gm}>=0.6,\"Profit product\",IF({gm}>=0.5,\"Traffic product\",\"Thin - rework\")))"
     }
    ],
    "sample": [
     {
-     "offer": "Example",
+     "offer": "CC's worked example (lecture slide; unit cost ≈$3.572 shows as $3.57)",
+     "price": 29.99,
+     "unit_cost": 3.5718,
+     "logistics": 6,
+     "warehousing": 0,
+     "payout_pct": 0.06,
+     "payout_fixed": 0.3,
+     "platform_pct": 0,
+     "refund_pct": 0.05,
+     "marketing_pct": 0.3,
+     "fx": 7
+    },
+    {
+     "offer": "Example: your offer",
      "price": 49.99,
      "unit_cost": 8,
-     "logistics": 7,
-     "platform_pct": 0.06,
-     "payment_pct": 0.03,
+     "logistics": 5,
+     "warehousing": 1,
+     "payout_pct": 0.06,
+     "payout_fixed": 0.3,
+     "platform_pct": 0.02,
      "refund_pct": 0.05,
      "marketing_pct": 0.3
     }
@@ -488,7 +619,7 @@
    "id": "selling-points",
    "module": "03",
    "title": "Selling-Point Sprint (S/A/B/C)",
-   "purpose": "List every possible selling point, grade it, test two per week through creators and own content, then go all-in on the proven one.",
+   "purpose": "List every selling point and grade it S/A/B/C (CC's slide). Rotate ONE selling point per test week (CC: week 1 point A, week 2 B, week 3 C …); CC also describes running two per week when capacity allows. Aggregate the data, then go all-in on the proven one.",
    "columns": [
     {
      "key": "point",
@@ -587,7 +718,7 @@
    "id": "hook-library",
    "module": "03",
    "title": "Hook Library",
-   "purpose": "Decompose every winning video (ours or reference) into hook / proof / scene / CTA, then recombine. The library is company capability.",
+   "purpose": "Decompose every winning video (ours or reference) into hook / proof / scene / CTA, then recombine. The library is company capability. Keep meme/personality one-offs out: CC's rule is that ~99% of selling hits follow the standard framework and ~1% can't be replicated.",
    "columns": [
     {
      "key": "hook_id",
@@ -603,7 +734,7 @@
     },
     {
      "key": "hook",
-     "label": "Hook (first 0-3s)",
+     "label": "Hook (beat A 0-3s; must hold viewers through second 6)",
      "type": "text",
      "w": 220
     },
@@ -618,7 +749,7 @@
       "Visual wow",
       "Context clash",
       "Before/after tease",
-      "Myth vs fact"
+      "Myth vs fact (aiOS addition)"
      ]
     },
     {
@@ -658,12 +789,12 @@
       "Context clash",
       "Visual wow",
       "Day-in-the-life",
-      "Unboxing"
+      "Unboxing (aiOS addition)"
      ]
     },
     {
-     "key": "retention_3s",
-     "label": "3s retention %",
+     "key": "retention_6s",
+     "label": "6s retention % (CC: ~60 of 100 → pushed to next pool)",
      "type": "pct"
     },
     {
@@ -687,9 +818,9 @@
      "scene": "Bathroom mirror",
      "cta": "Tap the cart, launch price today",
      "framework": "Pain-agitate-solve",
-     "retention_3s": 0.48,
      "why": "Face-close emotion + money pain",
-     "uses": 3
+     "uses": 3,
+     "retention_6s": 0.48
     }
    ]
   },
@@ -722,7 +853,7 @@
     },
     {
      "key": "beat_a",
-     "label": "A · Stop (0-3s)",
+     "label": "A · Stop (0-3s; hold through 6s)",
      "type": "text",
      "w": 200
     },
@@ -785,7 +916,7 @@
    "id": "asset-log",
    "module": "03",
    "title": "Asset Log & Triage",
-   "purpose": "Log every published asset, good or bad. Triage P0 (fix opening now) / P1 (watch) / P2 (leave).",
+   "purpose": "Log every published asset, good or bad. Triage P0 (fix opening now) / P1 (watch) / P2 (leave). Triage gate: CC's first-6-second rule (≈60 of 100 viewers through second 6 earns the next traffic pool).",
    "columns": [
     {
      "key": "asset",
@@ -823,8 +954,8 @@
      "type": "number"
     },
     {
-     "key": "retention_3s",
-     "label": "3s retention %",
+     "key": "retention_6s",
+     "label": "6s retention % (gate ≈60%)",
      "type": "pct"
     },
     {
@@ -858,7 +989,7 @@
      "key": "triage",
      "label": "Triage",
      "type": "formula",
-     "f": "IF({views}=0,\"\",IF({retention_3s}<0.25,\"P0 fix hook\",IF(AND({role}=\"Harvest\",{orders}=0),\"P1 check proof/CTA\",\"P2 keep\")))"
+     "f": "IF({views}=0,\"\",IF({retention_6s}<0.6,\"P0 fix hook (6s retention under 60%)\",IF(AND({role}=\"Harvest\",{orders}=0),\"P1 check proof/CTA\",\"P2 keep\")))"
     },
     {
      "key": "notes",
@@ -881,11 +1012,11 @@
      "role": "Harvest",
      "selling_point": "Salon result",
      "views": 18000,
-     "retention_3s": 0.41,
      "ctr": 0.021,
      "orders": 14,
      "spend": 120,
-     "revenue": 686
+     "revenue": 686,
+     "retention_6s": 0.41
     }
    ]
   },
@@ -1063,7 +1194,7 @@
    "id": "ad-diagnosis",
    "module": "04",
    "title": "Paid Ads Diagnosis",
-   "purpose": "Per creative: activation, ROAS vs break-even, triage. Diagnose in order: target → activation → creative → conversion path. Stage-aware: in 0→1, below break-even is expected while the system learns (≈50 conversions); judge creatives, not ROI, until then.",
+   "purpose": "Per creative: activation, ROAS vs break-even, net result vs a stop-loss line. Diagnose in order: target → activation → creative → conversion path. CC's 0→1 rule (slide): define the break-even ROI line AND the stop-loss line before launch; accept losses while the system learns (≈50 conversions), but stop at the stop-loss line. The 70%-of-break-even 'watch' band is an aiOS default.",
    "columns": [
     {
      "key": "creative",
@@ -1111,11 +1242,23 @@
      "type": "num2"
     },
     {
+     "key": "stop_loss",
+     "label": "Stop-loss: max net loss accepted ($, set before launch)",
+     "type": "money"
+    },
+    {
      "key": "roas",
      "label": "ROAS",
      "type": "formula",
      "f": "IFERROR({revenue}/{spend},0)",
      "fmt": "num2"
+    },
+    {
+     "key": "net",
+     "label": "Net after ads ($) = revenue ÷ break-even − spend",
+     "type": "formula",
+     "f": "IFERROR({revenue}/{breakeven},0)-{spend}",
+     "fmt": "money"
     },
     {
      "key": "active",
@@ -1127,7 +1270,7 @@
      "key": "priority",
      "label": "Priority",
      "type": "formula",
-     "f": "IF({spend}=0,\"Check target/activation\",IF({role}=\"Seed\",\"P2 keep (seeding)\",IF({roas}>={breakeven},\"P2 hero - scale\",IF(AND({stage}=\"0→1 validate\",{conversions}<50),\"Learning - hold until ~50 conversions\",IF({roas}>={breakeven}*0.7,\"P1 watch\",\"P0 fix opening\")))))",
+     "f": "IF({spend}=0,\"Check target/activation\",IF(AND({stop_loss}>0,{net}<=0-{stop_loss}),\"Stop-loss hit - pause; fix creative/offer\",IF({role}=\"Seed\",\"P2 keep (seeding)\",IF({roas}>={breakeven},\"P2 hero - scale\",IF(AND({stage}=\"0→1 validate\",{conversions}<50),\"Learning - hold until ~50 conversions\",IF({roas}>={breakeven}*0.7,\"P1 watch\",\"P0 fix opening\"))))))",
      "w": 170
     },
     {
@@ -1152,6 +1295,11 @@
      "label": "Conversions toward ~50 learning target",
      "f": "SUM(conversions)",
      "fmt": "int"
+    },
+    {
+     "label": "Net after ads",
+     "f": "SUM(net)",
+     "fmt": "money"
     }
    ],
    "sample": [
@@ -1162,7 +1310,115 @@
      "spend": 300,
      "revenue": 540,
      "conversions": 11,
-     "breakeven": 2.6
+     "breakeven": 2.6,
+     "stop_loss": 200
+    }
+   ]
+  },
+  {
+   "id": "scale-ceiling",
+   "module": "04",
+   "title": "Scale Ceiling Test (keep scaling or stop?)",
+   "tab": "Scale Ceiling",
+   "purpose": "CC's 10→100 case (lecture slide): to tell 'keep scaling' from 'hit the ceiling', watch marginal acquisition cost, conversion rate, creative freshness, audience expansion and inventory turnover together. If contribution profit from new revenue keeps falling as budget rises, stop pushing spend: add creatives, improve the product, or open a new market. One row per budget step; enter the previous period alongside.",
+   "columns": [
+    {
+     "key": "period",
+     "label": "Period",
+     "type": "text",
+     "w": 110
+    },
+    {
+     "key": "spend_prev",
+     "label": "Ad spend, previous period ($)",
+     "type": "money"
+    },
+    {
+     "key": "spend",
+     "label": "Ad spend, this period ($)",
+     "type": "money"
+    },
+    {
+     "key": "orders_prev",
+     "label": "Orders, previous",
+     "type": "number"
+    },
+    {
+     "key": "orders",
+     "label": "Orders, this period",
+     "type": "number"
+    },
+    {
+     "key": "profit_prev",
+     "label": "Contribution profit, previous ($)",
+     "type": "money"
+    },
+    {
+     "key": "profit",
+     "label": "Contribution profit, this period ($)",
+     "type": "money"
+    },
+    {
+     "key": "cvr_prev",
+     "label": "Conversion rate, previous %",
+     "type": "pct"
+    },
+    {
+     "key": "cvr",
+     "label": "Conversion rate, this period %",
+     "type": "pct"
+    },
+    {
+     "key": "fresh",
+     "label": "New creatives launched this period",
+     "type": "number"
+    },
+    {
+     "key": "new_audiences",
+     "label": "New audiences/markets opened",
+     "type": "number"
+    },
+    {
+     "key": "inv_days",
+     "label": "Inventory days of cover",
+     "type": "number"
+    },
+    {
+     "key": "marginal_cac",
+     "label": "Marginal cost per extra order ($)",
+     "type": "formula",
+     "f": "IF({orders}-{orders_prev}<=0,\"\",({spend}-{spend_prev})/({orders}-{orders_prev}))",
+     "fmt": "money"
+    },
+    {
+     "key": "incr_profit",
+     "label": "Extra profit per extra $1 of spend",
+     "type": "formula",
+     "f": "IF({spend}-{spend_prev}<=0,\"\",({profit}-{profit_prev})/({spend}-{spend_prev}))",
+     "fmt": "num2"
+    },
+    {
+     "key": "verdict",
+     "label": "Verdict",
+     "type": "formula",
+     "w": 280,
+     "f": "IF({spend}<={spend_prev},\"Budget not raised - no read\",IF({profit}<{profit_prev},\"Ceiling: profit falling as budget rises - stop pushing; add creatives, improve product or open a market\",IF(AND({cvr_prev}>0,{cvr}<{cvr_prev}),\"Watch: conversion slipping - refresh creatives before more budget\",IF({fresh}=0,\"Watch: no new creatives - freshness will decay\",\"Keep scaling in steps\"))))"
+    }
+   ],
+   "sample": [
+    {
+     "period": "Example wk 3→4",
+     "spend_prev": 2000,
+     "spend": 3000,
+     "orders_prev": 400,
+     "orders": 520,
+     "profit_prev": 5200,
+     "profit": 5050,
+     "cvr_prev": 0.031,
+     "cvr": 0.027,
+     "fresh": 4,
+     "new_audiences": 0,
+     "inv_days": 35
     }
    ]
   },
@@ -1255,13 +1511,13 @@
    "sample": [
     {
      "id": "H-001",
-     "statement": "Leading with selling point B lifts 3s retention ≥40% for parents",
+     "statement": "Leading with selling point B lifts 6s retention ≥60% for parents",
      "variable": "Selling point",
      "fixed": "Offer, price, creator tier, post time",
      "budget": 300,
      "spent": 120,
-     "kill": "<25% after 6 videos",
-     "success": "≥40% and ≥5 orders",
+     "kill": "<40% after 6 videos",
+     "success": "≥60% and ≥5 orders",
      "signals": 1,
      "decision": "Open"
     }
@@ -1319,15 +1575,15 @@
     },
     {
      "day": "4-10",
-     "milestone": "Selling points 1-2 tested via own content + creators; daily stand-ups"
+     "milestone": "Selling point A tested via own content + creators (one point this week); daily stand-ups"
     },
     {
      "day": "11-17",
-     "milestone": "Selling points 3-4; paid 0→1 tests aiming ~50 conversions"
+     "milestone": "Selling point B; paid 0→1 tests aiming ~50 conversions with break-even and stop-loss lines set"
     },
     {
      "day": "18-24",
-     "milestone": "Double down on leading point; remake heroes; creator wave 2"
+     "milestone": "Selling point C, or double down on the leader; remake heroes; creator wave 2"
     },
     {
      "day": "25-30",

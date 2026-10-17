@@ -1,2 +1,2 @@
 id,statement_cause_effect,variable_under_test,fixed_variables,test_design,budget_cap,kill_criterion,success_criterion,start,end,signal_1,signal_2,signal_3,result_observed,decision,learning
-H-001,"If we lead with selling point B (pain hook), 3s retention rises above 40% for audience: parents",selling point,"offer, price, creator tier, posting time","6 own videos + 5 creator videos over 7 days",$300,"3s retention <25% after 6 videos","3s retention ≥40% and ≥5 orders",,,,,,,,
+H-001,"If we lead with selling point B (pain hook), 6s retention rises above 60% for audience: parents",selling point,"offer, price, creator tier, posting time","6 own videos + 5 creator videos over 7 days",$300,"6s retention <40% after 6 videos","6s retention ≥60% and ≥5 orders",,,,,,,,

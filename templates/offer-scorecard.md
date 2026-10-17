@@ -17,7 +17,7 @@
 - Reframe opportunity (for example improvement → urgent need): 
 
 ## Classification
-☐ Profit product (value ≫ cost) ☐ Traffic product (~50–60% GM) ☐ Drop (value < cost)
+☐ Profit product (value ≫ cost; aiOS default ≥60% GM) ☐ Traffic product (~50–60% GM) ☐ Drop (value < cost)
 
 ## Traps check
 ☐ Passion ☐ Experience worship ☐ Emotion ☐ False analogy ☐ Single-point ☐ No validation
