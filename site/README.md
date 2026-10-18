@@ -1,0 +1,2 @@
+# site/: aiOS landing page
+A static site with no build step. The hosted URL is set once in `aios.config.json` (`hosted_url`, currently https://aios-grok.pages.dev) and the page links to it. It can be deployed alone to any static host (`npx wrangler pages deploy site --project-name <your-project>`), or together with the app: `bash cloudflare/prepare-deploy.sh <d1-id> <project> --with-site` puts it at `/`, with the queue at `/review` and the sheets at `/tools`.

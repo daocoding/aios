@@ -1,0 +1,184 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>aiOS · Content Review</title>
+<style>
+:root{--bg:#f7f5f0;--ink:#111;--gray:#9a9a9a;--line:#e3e0d8;--orange:#f26a1b;--card:#fff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.35 -apple-system,system-ui,Segoe UI,Roboto,sans-serif}
+header{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:2px solid var(--ink);padding:8px 12px;display:flex;align-items:center;gap:10px}
+.logo{display:grid;grid-template-columns:repeat(3,5px);gap:1px;flex-shrink:0}
+.logo i{width:5px;height:5px;background:var(--ink)}.logo i.o{background:transparent}.logo i.g{background:var(--gray)}
+h1{font-size:15px;margin:0;font-weight:800;letter-spacing:.02em;flex:1}h1 small{font-weight:500;color:#666}
+main{width:100%;margin:0;padding:0 0 24px}
+.toolbar{position:sticky;top:36px;z-index:15;background:var(--bg);border-bottom:1px solid var(--line);padding:6px 12px;display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.toolbar .sel{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.toolbar .filters{display:flex;gap:4px;overflow-x:auto;margin-left:auto}
+.tbtn{border:2px solid var(--ink);background:#fff;border-radius:0;padding:5px 9px;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap}
+.tbtn.ok{background:var(--ink);color:#fff}.tbtn.danger{border-color:var(--orange);color:var(--orange)}
+.tbtn:disabled{opacity:.4;cursor:default}
+.selcount{font-size:12px;font-weight:700;color:#555;min-width:5.5em}
+.chip{border:2px solid var(--ink);background:none;border-radius:0;padding:4px 8px;font-weight:700;font-size:12px;white-space:nowrap;cursor:pointer}
+.chip.on{background:var(--ink);color:#fff}
+.day{font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin:0;padding:6px 12px 4px;color:#555;border-top:1px solid var(--line);background:#f1efe9;font-weight:700}
+.row{display:grid;grid-template-columns:28px 118px minmax(0,1fr) auto auto;gap:8px;align-items:start;width:100%;background:var(--card);border-bottom:1px solid var(--line);border-left:4px solid var(--ink);padding:6px 10px;cursor:default}
+.row:focus{outline:2px solid var(--ink);outline-offset:-2px}
+.row.approved{border-left-color:var(--gray)}.row.changes_requested{border-left-color:var(--orange)}
+.row.skipped{opacity:.55}.row.posted{border-left-color:var(--gray);opacity:.8}
+.row.selected{background:#fff8f0}
+.row .ck{margin-top:4px;width:16px;height:16px;accent-color:var(--ink);cursor:pointer}
+.meta{font-size:11px;color:#555;line-height:1.3;display:flex;flex-direction:column;gap:3px}
+.meta .when{font-weight:800;color:var(--ink);font-size:12px}
+.meta .pillar{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:118px}
+.badge{display:inline-block;font-weight:800;font-size:10px;text-transform:uppercase;padding:1px 5px;background:var(--ink);color:#fff;width:fit-content}
+.badge.approved,.badge.posted{background:var(--gray)}.badge.changes_requested{background:var(--orange)}.badge.draft{background:var(--ink)}
+.chars{font-size:10px;color:#777}.chars.over{color:var(--orange);font-weight:800}
+.body{min-width:0}
+.text{white-space:pre-wrap;word-break:break-word;font-size:13px;line-height:1.35;margin:0;padding:2px 0;cursor:text}
+.text.editing{display:none}
+.parts{display:flex;flex-wrap:wrap;gap:6px}
+.part{flex:1 1 220px;min-width:0;border-left:2px solid var(--line);padding-left:6px}
+.part .plabel{font-size:10px;font-weight:800;color:#888;text-transform:uppercase}
+textarea.edit{display:none;width:100%;border:1px solid var(--line);background:#fcfbf8;font:inherit;font-size:13px;line-height:1.35;padding:4px 6px;resize:vertical;min-height:48px;border-radius:0;margin:0}
+.row.editing textarea.edit{display:block}.row.editing .text{display:none}
+textarea.edit:focus{outline:2px solid var(--ink)}
+.note{font-size:11px;color:#555;background:#f1efe9;padding:3px 6px;margin-top:4px}.oc{border-left:3px solid var(--orange)}
+.thumbwrap{display:flex;justify-content:center}
+img.thumb{width:72px;height:72px;object-fit:cover;border:1px solid var(--line);display:block}
+.actions{display:flex;flex-direction:column;gap:4px;min-width:92px}
+button.b{padding:5px 8px;font-weight:800;font-size:12px;border:2px solid var(--ink);background:#fff;border-radius:0;cursor:pointer;white-space:nowrap}
+button.ok{background:var(--ink);color:#fff}button.chg{border-color:var(--orange);color:var(--orange)}
+button.ed{border-color:var(--gray);color:#444}button.save{border-color:var(--orange);background:var(--orange);color:#fff}
+#login{max-width:360px;margin:15vh auto;padding:20px}#login input{width:100%;padding:12px;font-size:16px;border:2px solid var(--ink);margin:10px 0}
+#login button{width:100%;padding:12px;background:var(--ink);color:#fff;border:0;font-weight:800}
+.err{color:var(--orange)}a{color:var(--ink)}
+.empty{padding:24px 12px;color:#666}
+@media(max-width:700px){
+  .row{grid-template-columns:28px 1fr;grid-template-areas:"ck meta" "ck body" "ck thumb" "ck actions";gap:4px 8px;padding:8px 10px}
+  .row .ck{grid-area:ck}.meta{grid-area:meta;flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px}
+  .meta .pillar{max-width:none}.body{grid-area:body}.thumbwrap{grid-area:thumb;justify-content:flex-start}
+  img.thumb{width:56px;height:56px}.actions{grid-area:actions;flex-direction:row;flex-wrap:wrap;min-width:0}
+  .toolbar{top:36px}.toolbar .filters{margin-left:0;width:100%}
+  .parts{flex-direction:column}
+}
+</style></head><body>
+<header><div class="logo" id="logo"></div><h1>aiOS <small>Content Review</small></h1><a href="/tools" style="margin-left:auto;font-size:14px">Operating Sheets →</a></header>
+<div id="login" hidden><h2>Owner passcode</h2><input id="pw" type="password" autocomplete="current-password" placeholder="Passcode"><button onclick="login()">Unlock</button><p class="err" id="lerr"></p></div>
+<main id="app" hidden>
+  <div class="toolbar" id="toolbar">
+    <div class="sel">
+      <button class="tbtn" type="button" onclick="selectAll()">Select all</button>
+      <button class="tbtn" type="button" onclick="selectNone()">Select none</button>
+      <span class="selcount" id="selcount">0 selected</span>
+      <button class="tbtn ok" type="button" id="bulkApprove" onclick="bulkAct('approve')" disabled>Approve selected</button>
+      <button class="tbtn danger" type="button" id="bulkSkip" onclick="bulkAct('skip')" disabled>Skip selected</button>
+    </div>
+    <div class="filters" id="filters"></div>
+  </div>
+  <div id="list"></div>
+</main>
+<script>
+const L=[1,1,1, 1,0,2, 1,1,1, 1,0,1, 1,1,1];
+document.getElementById('logo').innerHTML=L.map(v=>`<i class="${v==0?'o':v==2?'g':''}"></i>`).join('');
+const ST=['all','draft','changes_requested','approved','skipped','posted'];
+let filt='draft',posts=[],selected=new Set(),lastChecked=null,focusedId=null;
+const $=s=>document.querySelector(s), esc=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+async function api(p,b){const r=await fetch(p,b?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}:{});if(r.status==401){show(false);throw 0}return r.json()}
+function show(a){$('#login').hidden=a;$('#app').hidden=!a}
+async function login(){const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:$('#pw').value})});if(r.ok){$('#pw').value='';load()}else $('#lerr').textContent='Wrong passcode'}
+$('#pw').addEventListener('keydown',e=>e.key=='Enter'&&login());
+window.aiosAfterLogin=()=>load();
+function xlen(s){s=(s||'').replace(/https?:\/\/\S+/g,'x'.repeat(23));let n=0;for(const ch of s){const c=ch.codePointAt(0);n+=(c<=0x10FF||(c>=0x2000&&c<=0x200D)||(c>=0x2010&&c<=0x201F)||(c>=0x2032&&c<=0x2037))?1:2}return n}
+const tz={timeZone:'America/New_York'};
+const dayKey=iso=>new Date(iso).toLocaleDateString('en-US',{...tz,weekday:'short',month:'short',day:'numeric'});
+const tm=iso=>new Date(iso).toLocaleTimeString('en-US',{...tz,hour:'numeric',minute:'2-digit'});
+const lbl=s=>(s||'').replace('_',' ');
+function shown(){return posts.filter(p=>filt=='all'||p.status==filt)}
+function updateSelUI(){
+  const n=selected.size;$('#selcount').textContent=n+' selected';
+  $('#bulkApprove').disabled=!n;$('#bulkSkip').disabled=!n;
+  document.querySelectorAll('.row').forEach(el=>{
+    const id=+el.dataset.id;el.classList.toggle('selected',selected.has(id));
+    const ck=el.querySelector('.ck');if(ck)ck.checked=selected.has(id);
+  });
+}
+function selectAll(){shown().forEach(p=>selected.add(p.id));updateSelUI()}
+function selectNone(){selected.clear();updateSelUI()}
+function onCheck(e,id){
+  const ids=shown().map(p=>p.id);
+  if(e.shiftKey&&lastChecked!=null){
+    const a=ids.indexOf(lastChecked),b=ids.indexOf(id);
+    if(a>=0&&b>=0){const[lo,hi]=a<b?[a,b]:[b,a];const on=e.target.checked;for(let i=lo;i<=hi;i++){if(on)selected.add(ids[i]);else selected.delete(ids[i])}}
+  }else{if(e.target.checked)selected.add(id);else selected.delete(id)}
+  lastChecked=id;updateSelUI();
+}
+function maxChars(p){const parts=p.parts||[p.text];return Math.max(...parts.map(xlen))}
+function render(){
+  $('#filters').innerHTML=ST.map(s=>`<button class="chip ${s==filt?'on':''}" onclick="setFilt('${s}')">${lbl(s)} ${s=='all'?posts.length:posts.filter(p=>p.status==s).length}</button>`).join('');
+  const visible=new Set(shown().map(p=>p.id));
+  [...selected].forEach(id=>{if(!visible.has(id))selected.delete(id)});
+  const g={};shown().forEach(p=>(g[p.scheduled_at?dayKey(p.scheduled_at):'Unscheduled']??=[]).push(p));
+  $('#list').innerHTML=Object.keys(g).length?Object.entries(g).map(([d,ps])=>`<div class="day">${d}</div>`+ps.map(row).join('')).join(''):'<p class="empty">Nothing here.</p>';
+  updateSelUI();
+  if(focusedId){const el=$(`#r${focusedId}`);if(el)el.focus()}
+}
+function setFilt(s){filt=s;render()}
+function row(p){
+  const parts=p.parts||[p.text];
+  const isThread=!!p.parts&&p.parts.length>1;
+  const mc=maxChars(p);
+  const body=isThread
+    ?`<div class="parts">${parts.map((t,i)=>`<div class="part"><div class="plabel">${i+1}/${parts.length} · <span class="chars ${xlen(t)>280?'over':''}">${xlen(t)}/280</span></div><div class="text" onclick="startEdit(${p.id})">${esc(t)}</div><textarea class="edit" data-i="${i}" rows="${Math.min(8,Math.max(2,t.split('\n').length+1))}">${esc(t)}</textarea></div>`).join('')}</div>`
+    :`<div class="text" onclick="startEdit(${p.id})">${esc(parts[0]||'')}</div><textarea class="edit" data-i="0" rows="${Math.min(8,Math.max(2,(parts[0]||'').split('\n').length+1))}">${esc(parts[0]||'')}</textarea>`;
+  return `<div class="row ${p.status}" id="r${p.id}" data-id="${p.id}" tabindex="0" onfocus="focusedId=${p.id}" onclick="if(event.target.closest('button,input,textarea,a'))return;focusedId=${p.id}">
+    <input class="ck" type="checkbox" ${selected.has(p.id)?'checked':''} onclick="event.stopPropagation();onCheck(event,${p.id})">
+    <div class="meta"><span class="when">${p.scheduled_at?tm(p.scheduled_at)+' ET':''}</span><span class="pillar">${esc(p.pillar||'')}${isThread?` · ${parts.length}pt`:''}</span><span class="badge ${p.status}">${lbl(p.status)}</span><span class="chars ${mc>280?'over':''}">${mc}/280</span></div>
+    <div class="body">${body}
+      ${p.operator_note?`<div class="note">Note: ${esc(p.operator_note)}</div>`:''}
+      ${p.owner_comment?`<div class="note oc">You: ${esc(p.owner_comment)}</div>`:''}
+      ${p.posted_url?`<div class="note"><a href="${esc(p.posted_url)}" target="_blank" rel="noopener">View on X</a></div>`:''}
+    </div>
+    ${p.image_path?`<div class="thumbwrap"><img class="thumb" loading="lazy" src="/api/image/${p.id}" alt=""></div>`:''}
+    <div class="actions">
+      ${p.status=='posted'?'':`<button class="b ok" onclick="act(${p.id},'approve')">Approve</button>
+      <button class="b ed" onclick="startEdit(${p.id})">Edit</button>
+      <button class="b chg" onclick="chg(${p.id})">Changes</button>
+      <button class="b" onclick="act(${p.id},'skip')">Skip</button>
+      <button class="b save" style="display:none" onclick="save(${p.id})">Save &amp; approve</button>`}
+    </div>
+  </div>`;
+}
+function startEdit(id){
+  const el=$(`#r${id}`);if(!el)return;
+  document.querySelectorAll('.row.editing').forEach(r=>{if(r!==el){r.classList.remove('editing');const s=r.querySelector('.save');if(s)s.style.display='none'}});
+  el.classList.add('editing');focusedId=id;el.focus();
+  const s=el.querySelector('.save');if(s)s.style.display='block';
+  const ta=el.querySelector('textarea.edit');if(ta){ta.focus();ta.oninput=()=>refreshChars(el)}
+  el.querySelectorAll('textarea.edit').forEach(t=>t.oninput=()=>refreshChars(el));
+}
+function refreshChars(el){
+  el.querySelectorAll('.part').forEach(part=>{
+    const t=part.querySelector('textarea.edit');if(!t)return;
+    const n=xlen(t.value);const c=part.querySelector('.chars');if(c){c.textContent=n+'/280';c.className='chars'+(n>280?' over':'')}
+  });
+  const texts=[...el.querySelectorAll('textarea.edit')].map(t=>t.value);
+  if(texts.length){const n=Math.max(...texts.map(xlen));const c=el.querySelector('.meta .chars');if(c){c.textContent=n+'/280';c.className='chars'+(n>280?' over':'')}}
+}
+async function act(id,a,b={}){const r=await api(`/api/posts/${id}/${a}`,b);posts=posts.map(p=>p.id==id?r:p);selected.delete(id);render()}
+function chg(id){const c=prompt('What should change?');if(c!==null)act(id,'request_changes',{comment:c})}
+function save(id){const p=posts.find(p=>p.id==id);if(!p)return;
+  const v=[...document.querySelectorAll(`#r${id} textarea.edit`)].map(t=>t.value);
+  act(id,'edit',p.parts?{parts:v,text:v[0]}:{text:v[0]})}
+async function bulkAct(action){
+  const ids=[...selected].filter(id=>{const p=posts.find(x=>x.id==id);return p&&p.status!=='posted'});
+  if(!ids.length)return;
+  if(!confirm(`${action==='approve'?'Approve':'Skip'} ${ids.length} post(s)?`))return;
+  await api('/api/bulk',{ids,action});selected.clear();await load();
+}
+document.addEventListener('keydown',e=>{
+  if(e.target.matches('input,textarea'))return;
+  if(e.key==='a'&&focusedId!=null){e.preventDefault();const p=posts.find(x=>x.id==focusedId);if(p&&p.status!=='posted')act(focusedId,'approve')}
+});
+async function load(){try{posts=await api('/api/posts');show(true);render()}catch(e){}}
+load();
+</script><script src="/signup.js"></script>
+</body></html>
